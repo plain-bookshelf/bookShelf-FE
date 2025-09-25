@@ -1,9 +1,8 @@
 import * as S from "./style"
 import { useState } from "react"
-import profileImg from "../../assets/profileImg.png"
 
 export default function MyProfile() {
-  const [userName, setUserName] = useState("ZXO");
+  const [userInfo, setUserInfo] = useState({name: "ZXO", img: "https://cdn.discordapp.com/attachments/1137618300638072832/1419603738586382356/image.png?ex=68d456c2&is=68d30542&hm=81cc1868de12d0dc5cd1c43c32159935a71fb725ea8336145e341de6c3c7079c&"});
   const [borrowBooks, setBorrowBooks] = useState([{title: "죽고 싶은 아이. 1", state: 3, id: 1},{title: "푸른사자와니니", state: 12, id: 2}]);
   const [reserveBooks, setReserveBooks] = useState([{title: "동이는 장돌뱅...", id: 1,}]);
   const [overdueBooks, setOverdueBooks] = useState([{title: "자몽살구클럽", state: 4, id: 1}]);
@@ -16,8 +15,8 @@ export default function MyProfile() {
           <S.BannerTitle>마이페이지</S.BannerTitle>
           <S.ProfileContainer>
             <S.ProfileBox>
-              <img src={profileImg} alt="" style={{width: 100}} />
-              <span><S.InfoTitle color="#00C471">{userName}</S.InfoTitle><S.InfoTitle color="black">님의 회원정보</S.InfoTitle></span>
+              <img src={userInfo.img} alt="" style={{width: 100}} />
+              <span><S.InfoTitle color="#00C471">{userInfo.name}</S.InfoTitle><S.InfoTitle color="black">님의 회원정보</S.InfoTitle></span>
             </S.ProfileBox>
             <S.InfoContainer>
               <S.InfoBox>
