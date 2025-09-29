@@ -36,6 +36,7 @@ export const SearchButton = styled.div`
   }
 `
 
-type BorderColor = {
-  color: string;
-}
+export const Container = styled.div`
+  display: flex;
+  justify-content: center;
+`

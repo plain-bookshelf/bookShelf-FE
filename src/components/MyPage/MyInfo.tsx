@@ -29,7 +29,7 @@ export default function MyProfile() {
               </S.InfoBox>
               <S.InfoBox>
                 <S.InfoTitle color="black">패널티 남은 시간</S.InfoTitle>
-                <span><S.InfoContent color="#00C471">{/* 어떻게 짜야 함? */}</S.InfoContent><S.InfoContent color="black">일</S.InfoContent></span>
+                <span><S.InfoContent color="#00C471">{/* 어떻게 짜야 함 ? */}</S.InfoContent><S.InfoContent color="black">일</S.InfoContent></span>
               </S.InfoBox>
               <S.InfoBox>
                 <S.InfoTitle color="black">한 달 통계</S.InfoTitle>
