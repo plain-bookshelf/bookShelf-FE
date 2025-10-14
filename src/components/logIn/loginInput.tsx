@@ -1,6 +1,6 @@
 
 
-import  Header from '../Header';
+import  Header from '../../layouts/Header';
 import * as S from "./style";
 import user from '../../assets/user.png';
 import lock from '../../assets/lock.png';
