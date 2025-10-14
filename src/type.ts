@@ -18,3 +18,9 @@ export type UserInfo = {
   name: string;
   img: string;
 }
+
+export type MyBook = {
+  title: string;
+  state: number | string;
+  id: number;
+}

@@ -1,6 +1,6 @@
 import SearchBar from "../components/SearchBar/SearchBar"
 import * as B from "../components/Book/Book"
-import type { Book } from "../type"
+import type { Book, PopularBook } from "../type"
 import { useState } from "react"
 import { Line } from "../components/Book/style"
 
@@ -10,8 +10,8 @@ function temp(a: string){
 
 export default function Main() {
   const [searchBookList, setSearchBookList] = useState<Book[]>([]);
-  const [popularBookList, setPopularBookList] = useState([{title: "아 제발", author: "아 진짜", category: "암거나", nowRank: 3, preRank: 1, img: "a"}]);
-  const [newBookList, setNewBookList] = useState([{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"}]);
+  const [popularBookList, setPopularBookList] = useState<PopularBook[]>([{title: "아 제발", author: "아 진짜", category: "암거나", nowRank: 3, preRank: 1, img: "a"}]);
+  const [newBookList, setNewBookList] = useState<Book[]>([{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"}]);
  
  return(<>
     <SearchBar handleSearch={temp} />
