@@ -1,6 +1,3 @@
-
-
-import  Header from '../../layouts/Header';
 import * as S from "./style";
 import user from '../../assets/user.png';
 import lock from '../../assets/lock.png';
@@ -8,7 +5,6 @@ import lock from '../../assets/lock.png';
 export function LogInInPut(){
   return(
     <>
-       <Header/>
       <S.LogInContent>
         <S.TextContent>
           <S.LogInText>로그인</S.LogInText>

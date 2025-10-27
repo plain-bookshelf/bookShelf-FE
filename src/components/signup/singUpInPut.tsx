@@ -1,6 +1,3 @@
-
-
-import Header from "../../layouts/Header";
 import * as S from "./style";
 import user from "../../assets/user.png";
 import lock from "../../assets/lock.png"
@@ -8,7 +5,6 @@ import lock from "../../assets/lock.png"
 export function SingInInPut(){
   return(
     <>
-       <Header/>
       <S.SingInContent>
         <S.TextContent>
           <S.SingInTitle>회원가입</S.SingInTitle>
