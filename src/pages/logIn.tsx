@@ -1,4 +1,4 @@
-import LogInInfo from '../components/logIn/loginInput';
+import LogInInfo from '../components/login/loginInput';
 
 export default function LogIn(){
   return(

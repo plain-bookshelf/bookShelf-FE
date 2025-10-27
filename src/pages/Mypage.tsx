@@ -1,4 +1,4 @@
-import MyProfile from "../components/MyPage/MyInfo";
+import MyProfile from "../components/my/MyInfo";
 
 export default function My() {
   return(<>
