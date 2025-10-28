@@ -3,11 +3,10 @@ import * as S from "./style"
 import chatBotProfile from "../..//assets/chatBotProfile.png"
 import type { Queryfunc } from "../../types/function"
 
-export function FirstChat({handleSend}: Queryfunc) {
+export function FirstChat() {
   return(
     <S.firstContent>
       <S.firstMessage>지금 읽고 싶은 책, 같이 찾아볼까요?</S.firstMessage>
-      <InputBar handleSend={handleSend} />
     </S.firstContent>
   )
 }

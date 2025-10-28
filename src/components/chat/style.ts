@@ -6,7 +6,7 @@ export const firstContent = styled.div`
   justify-content: center;
   align-items: center;
   gap: 35px;
-  margin: 200px 0 280px 0;
+  margin: 200px 0 35px 0;
 `
 
 export const firstMessage = styled.span`
@@ -34,6 +34,7 @@ export const AIName = styled.span`
 `
 
 export const ChatBox = styled.div<WhoChat>`
+  width: 100%;
   display: flex;
   justify-content: ${({AI}) => AI ? "flex-start" : "flex-end"};
 `

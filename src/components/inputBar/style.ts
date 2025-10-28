@@ -8,9 +8,10 @@ export const InputContainer = styled.div`
   width: 860px;
   height: 70px;
   padding: 10px 20px;
-  border: 1px solid #E7E7E7;
+  border: 1px solid rgba(0, 196, 113, 0.6);
   background-color: #ffffff;
   border-radius: 100px;
+  box-shadow: 0 0 5px 0 rgba(0, 196, 113, 0.25);
 `
 
 export const Input = styled.input`
@@ -25,7 +26,3 @@ export const Input = styled.input`
     color: #ADADAD;
   }
 `
-
-type FirstInputBar = {
-  first: boolean;
-}
