@@ -4,6 +4,7 @@ import Main from "./pages/Main";
 import RecommandList from "./pages/Recommand";
 import Layout from "./layouts/Layout";
 import ChatBot from "./pages/chatBot";
+import BorrowAllow from "./pages/borrowAllow";
 
 export default function Router() {
   return (
@@ -14,6 +15,7 @@ export default function Router() {
           <Route path="/my" element={<My />} />
           <Route path="recommand" element={<RecommandList />} />
           <Route path="chat" element={<ChatBot />} />
+          <Route path="allow" element={<BorrowAllow />} />
         </Route>
       </Routes>
     </BrowserRouter>

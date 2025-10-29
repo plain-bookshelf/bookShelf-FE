@@ -6,7 +6,7 @@ export const firstContent = styled.div`
   justify-content: center;
   align-items: center;
   gap: 35px;
-  margin: 200px 0 35px 0;
+  margin: 170px 0 35px 0;
 `
 
 export const firstMessage = styled.span`
