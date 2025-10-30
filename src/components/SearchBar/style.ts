@@ -11,6 +11,7 @@ export const SearchContainer = styled.div<{ $active: boolean }>`
   align-items: center;
   border-radius: 15px;
   padding: 17px 30px;
+  margin-bottom: 40px;
   &:focus-within{
     border-color: black;
     color: black;

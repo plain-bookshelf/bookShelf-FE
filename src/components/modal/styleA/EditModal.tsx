@@ -8,7 +8,7 @@ import { useState } from "react";
 import Cropper from "react-easy-crop";
 
 export default function EditModal({ onClose }: { onClose: () => void }) {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   const [nextStep, setNextStep] = useState(false);
   const [preview, setPreview] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -50,6 +50,7 @@ export default function EditModal({ onClose }: { onClose: () => void }) {
     const [crop, setCrop] = useState({x: 0, y: 0});
     const [zoom, setZoom] = useState(1);
     const cropSize = { width: 120, height: 120 };
+    
     const handleCropChange = (newCrop: any) => {
       setCrop(newCrop)
     }

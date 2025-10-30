@@ -1,25 +1,23 @@
-import {BrowserRouter, Routes, Route} from 'react-router-dom';
-import LogIn from './pages/logIn';
-import Main from './pages/Main';
-import My from './pages/Mypage';
-import SingUp from './pages/singUp';
-import Layout from './layouts/Layout';
-import RecommandList from './pages/Recommand';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import My from "./pages/Mypage";
+import Main from "./pages/Main";
+import RecommandList from "./pages/Recommand";
+import Layout from "./layouts/Layout";
+import ChatBot from "./pages/chatBot";
+import BorrowAllow from "./pages/borrowAllow";
 
-export default function Router(){
-  return(
-    <>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<Layout />}>
-            <Route path='/' element={<Main />} />
-            <Route path='/login' element={<LogIn />}/>
-            <Route path='/signup' element={<SingUp />}/>
-            <Route path='/my' element={<My />} />
-            <Route path='/recommand' element={<RecommandList />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </>
-  )
+export default function Router() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />} >
+          <Route path="/" element={<Main />} />
+          <Route path="/my" element={<My />} />
+          <Route path="recommand" element={<RecommandList />} />
+          <Route path="chat" element={<ChatBot />} />
+          <Route path="allow" element={<BorrowAllow />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
 }

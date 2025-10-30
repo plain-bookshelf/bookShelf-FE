@@ -1,12 +1,9 @@
 import search from "../../assets/search.png"
 import { useState } from "react"
 import * as S from "./style"
+import type { Queryfunc } from "../../types/function";
 
-type func = {
-  handleSearch: (query: string) => void;
-}
-
-export default function SearchBar({handleSearch}: func) {
+export default function SearchBar({handleSearch}: Queryfunc) {
   const [query, setQuery] = useState<string>("");
   const [focused, setFocused] = useState<boolean>(false);
 

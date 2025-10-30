@@ -28,7 +28,7 @@ export default function Main() {
 
     {searchBookList.length !== 0 && search &&
       <div>
-        <Title style={{margin: "50px auto 60px 240px"}}><span style={{color: "#00C471"}}>{query}</span>에 대한 검색 결과입니다</Title>
+        <Title style={{margin: "0px auto 60px 240px"}}><span style={{color: "#00C471"}}>'{query}'</span> 에 대한 검색 결과입니다</Title>
         <B.BookList BookListTitle="검색 결과">
           {searchBookList.map((e) => (
           <B.Book
@@ -45,8 +45,7 @@ export default function Main() {
     {searchBookList.length === 0 && search &&
       <Container>
         <img src={searchResult} style={{margin: "155px 0 54px"}} />
-        <Title style={{margin: "0", color: "#878787"}}><span style={{color: "#00C471", fontSize: "40px"}}>'{query}'</span>에 대한 검색 결과가 없습니다</Title>
-        <Title style={{margin: "0 0 100px 0", color: "#878787"}}>이런 책은 어떠세요?</Title>
+        <Title style={{margin: "0 0 100px 0", color: "#878787"}}><span style={{color: "#00C471", fontSize: "40px"}}>'{query}'</span>에 대한 검색 결과가 없습니다</Title>
       </Container>
     }
 
