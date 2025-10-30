@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { ManagementContext } from "../contexts/ManagementContext";
 import "./PaginationBar.css";
+import paginationArrow from "../../assets/paginationArrow.png"
+import { Route } from "react-router-dom";
 
 export default function PaginationBar() {
   const [currentPage, setCurrentPage] = useState(0);
@@ -22,8 +24,8 @@ export default function PaginationBar() {
 
   return(
       <ReactPaginate
-        previousLabel={"‹"}
-        nextLabel={"›"}
+        previousLabel={<img src={paginationArrow} />}
+        nextLabel={<img src={paginationArrow} style={{rotate: "180deg"}} />}
         breakLabel={"..."}
         pageCount={pageCount}
         marginPagesDisplayed={2}
