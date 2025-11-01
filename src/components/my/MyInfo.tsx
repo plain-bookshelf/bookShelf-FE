@@ -4,11 +4,10 @@ import type { MyBook } from "../../types/Book";
 import userInfoedit from "../../assets/userInfoEdit.png"
 import userImgEdit from "../../assets/userImgEdit.png"
 import { useUser } from "../contexts/UserContext";
-import { Navigate } from "react-router-dom";
 import EditModal from "../modal/styleA/EditModal";
 
 export default function MyProfile() {
-  const { user, editUser } = useUser()
+  const { user } = useUser();
   const [borrowBooks, setBorrowBooks] = useState<MyBook[]>([{title: "죽고 싶은 아이. 1", state: 3, id: 1},{title: "푸른사자와니니", state: 12, id: 2},{title: "디자인좀 그만 바뀌면", state: 100, id: 3},{title: "디자인좀 그만 바뀌면", state: 100, id: 4}]);
   const [reserveBooks, setReserveBooks] = useState<MyBook[]>([{title: "동이는 장돌뱅...", state: "대여", id: 1,}]);
   const [overdueBooks, setOverdueBooks] = useState<MyBook[]>([{title: "자몽살구클럽", state: 6, id: 1}, {title: "자몽살구클럽", state: 4, id: 2}]);
@@ -17,7 +16,6 @@ export default function MyProfile() {
   const [statistics, setStatistics] = useState(0);
   const [edit, setEdit] = useState(false);
   const [editImgModal, setEditImgModal] = useState(false);
-  const [uploadImgModal, setUploadImgModal] = useState(false);
   const [editName, setEditName] = useState(user.name);
   const [editPassword, setEditPassword] = useState("");
 
@@ -28,8 +26,8 @@ export default function MyProfile() {
           <S.BannerTitle>마이페이지</S.BannerTitle>
           <S.ProfileContainer>
             <S.ProfileBox>
-              <S.ProfileOutlien onClick={() => setUploadImgModal(true)}>
-                <img src={user.img} style={{width: "100px"}} />
+              <S.ProfileOutlien onClick={() => setEditImgModal(true)}>
+                <img src={user.img} style={{width: "100px", height: "100px", borderRadius: "50%"}} />
                 <img src={userImgEdit} style={{position: "absolute"}} />
               </S.ProfileOutlien>
               <div style={{display: "flex", alignItems: "center"}}>
@@ -132,7 +130,7 @@ export default function MyProfile() {
             </S.EditInputContainer>
             <S.Button>확인</S.Button>
           </S.EditContainer>}
-          {uploadImgModal && <EditModal onClose={() => setUploadImgModal(false)}/>}
+          {editImgModal && <EditModal onClose={() => setEditImgModal(false)}/>}
       </S.Banner>
     </>
   )
