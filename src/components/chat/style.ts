@@ -36,18 +36,21 @@ export const AIName = styled.span`
 export const ChatBox = styled.div<WhoChat>`
   width: 100%;
   display: flex;
-  justify-content: ${({AI}) => AI ? "flex-start" : "flex-end"};
+  justify-content: ${({$AI}) => $AI ? "flex-start" : "flex-end"};
 `
 
 export const Chat = styled.span<WhoChat>`
-  background-color: ${({AI}) => AI ? "#EEEEEE" : "#00C471"};
-  color: ${({AI}) => AI ? "black" : "white"};
+  background-color: ${({$AI}) => $AI ? "#EEEEEE" : "#00C471"};
+  color: ${({$AI}) => $AI ? "black" : "white"};
   font-size: 20px;
+  max-width: 100%;
+  white-space: normal;
   font-weight: 500;
   border-radius: 30px;
   padding: 16px 20px;
+  line-height: 1.9;
 `
 
 type WhoChat = {
-  AI: boolean;
+  $AI: boolean;
 }

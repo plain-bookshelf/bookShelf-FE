@@ -120,7 +120,7 @@ export default function MyProfile() {
                   onChange={(e) => setEditName(e.target.value)}></S.EditInput>
               </S.EditInputBox>
               <S.EditInputBox>
-                <S.EditInputTitle>비밀번호 수정</S.EditInputTitle>
+                <S.EditInputTitle>이메일</S.EditInputTitle>
                 <S.EditInput
                   color="#ffffff"
                   value={editPassword}
