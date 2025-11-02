@@ -2,11 +2,11 @@ import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import type { UserContextType, UserInfo } from "../../types/User";
 
-export const UserContext = createContext<UserContextType>({ user: {name: "ZXO", img:""}, setUser: () => {} });
+export const UserContext = createContext<UserContextType>({ user: {id: 1, name: "ZXO", img:""}, setUser: () => {} });
 
 /*{ children } 구조분해 할당 받고 { children: ReactNode } 구조분해 할당 받은 children이 ReactNode라고 명시 {} 로 둘다 감싼 건 둘다 객체임을 명시*/
 export const Provider = ({ children }: { children: ReactNode }) => { 
-  const [user, setUser] = useState<UserInfo>({ name: "ZXO", img: "" });
+  const [user, setUser] = useState<UserInfo>({ id: 1, name: "ZXO", img: "" });
 
   const updateUser = (newData: UserInfo) => setUser(newData);
 

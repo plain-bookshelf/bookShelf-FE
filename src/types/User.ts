@@ -1,8 +1,8 @@
 export type UserInfo = {
-  id?: string;
-  name?: string;
+  id: number;
+  name: string;
   email?: string;
-  img?: string;
+  img: string;
 }
 
 export type UserContextType = {

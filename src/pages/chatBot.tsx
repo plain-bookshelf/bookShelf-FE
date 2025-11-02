@@ -3,13 +3,17 @@ import { useRef, useState, useEffect } from "react";
 import styled from "styled-components";
 import type { Chat } from "../types/Chat"
 import InputBar from "../components/inputBar/InputBar";
+import { useUser } from "../components/contexts/UserContext";
+import { postMessage } from "../api/chatBot";
 
 export default function ChatBot() {
+  const { user } = useUser();
   const [chatList, setChatList] = useState<Chat[]>([]);
   const [move, setMove] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  function temp(content: string){
+  const send = async (content: string) => {
+    console.log("요청 보냄 대기중");
     if(content === ""){
       alert("채팅을 입력해주세요");
       return;
@@ -19,7 +23,15 @@ export default function ChatBot() {
       setMove(true);
     }
 
-    setChatList([...chatList, {who: "Me", content: content}]);
+    setChatList(prev => [...prev, {who: "Me", content: content}]);
+
+    try{
+      const answer = await postMessage(user.id, content);
+      console.log("답변 데이터:", answer)
+      setChatList(prev => [...prev, {who: "AI", content: answer}]);
+    } catch(error) {
+      console.error(error);
+    }
   }
   useEffect(() => {
     containerRef.current?.scrollBy({ top: 100, behavior: "smooth" });
@@ -37,7 +49,7 @@ export default function ChatBot() {
           ))}
         </ChatContainer>
         <InputBarWrapper move={move}>
-          <InputBar handleSend={temp} />
+          <InputBar handleSend={send} />
         </InputBarWrapper>
       </Container>
   )

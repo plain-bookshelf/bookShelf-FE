@@ -35,7 +35,7 @@ export default function EditModal({ onClose }: { onClose: () => void }) {
                 <S.BoxHeaderTitle>프로필 사진 추가</S.BoxHeaderTitle>
               </S.BoxHeader>
               <S.ProfileOutlien>
-                <img src={user.img} style={{width: "120px"}} />
+                <img src={user.img} style={{width: "120px", borderRadius: "50%"}} />
               </S.ProfileOutlien>
             </S.BoxContent>
             <S.BoxLine />

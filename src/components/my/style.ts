@@ -212,6 +212,8 @@ export const EditInput = styled.input<Color>`
   width: 700px;
   height: 64px;
   padding: 20px;
+  font-size: 20px;
+  font-weight: 600;
   color: #5A5A5A;
   border: 1px solid #5A5A5A;
   border-radius: 10px;
