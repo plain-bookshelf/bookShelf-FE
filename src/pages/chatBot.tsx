@@ -34,7 +34,7 @@ export default function ChatBot() {
     }
   }
   useEffect(() => {
-    containerRef.current?.scrollBy({ top: 100, behavior: "smooth" });
+    containerRef.current?.scrollBy({ top: 1000, behavior: "smooth" });
   }, [chatList]);
 
   //여기 리팩토링 시급함;;

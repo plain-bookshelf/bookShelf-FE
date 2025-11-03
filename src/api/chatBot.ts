@@ -1,5 +1,5 @@
 export const postMessage = async (userId: number, content: string) => {
-  const res = await fetch("http://10.84.252.219:8000/Bookshelf_AI", {
+  const res = await fetch("http://192.168.1.49:8000/Bookshelf_AI", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ user_id: userId, user_said: content }),
