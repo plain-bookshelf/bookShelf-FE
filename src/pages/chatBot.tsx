@@ -10,6 +10,7 @@ export default function ChatBot() {
   const { user } = useUser();
   const [chatList, setChatList] = useState<Chat[]>([]);
   const [move, setMove] = useState(false);
+  const [sayChat, setsayChat] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const send = async (content: string) => {
@@ -24,15 +25,42 @@ export default function ChatBot() {
     }
 
     setChatList(prev => [...prev, {who: "Me", content: content}]);
+    setChatList((prev) => [...prev, { who: "AI", content: "" , loading: true}]);
+    setsayChat(true);
 
-    try{
-      const answer = await postMessage(user.id, content);
-      console.log("답변 데이터:", answer)
-      setChatList(prev => [...prev, {who: "AI", content: answer}]);
-    } catch(error) {
-      console.error(error);
+    try {
+      const fullText = await postMessage(user.id, content);
+
+      const chars = fullText.split("");
+      await new Promise<void>((resolve) => {
+        let index = 0;
+        const interval = setInterval(() => {
+          if (index < chars.length) {
+            const nextChar = chars[index];
+            setChatList((prev) => {
+              const updated = [...prev];
+              const last = updated[updated.length - 1];
+              updated[updated.length - 1] = {
+                ...last,
+                content: (last.content || "") + nextChar,
+                loading: false,
+              };
+              return updated;
+            });
+            index++;
+          } else {
+            clearInterval(interval);
+            resolve();
+          }
+        }, 35);
+      });
+
+      setsayChat(false);
+    } catch (error) {
+      console.error("에러 남", error);
+      setsayChat(false);
     }
-  }
+  };
   useEffect(() => {
     containerRef.current?.scrollBy({ top: 1000, behavior: "smooth" });
   }, [chatList]);
@@ -44,12 +72,12 @@ export default function ChatBot() {
         <ChatContainer ref={containerRef}>
           {chatList.map((e) => (
             e.who === "AI" 
-              ? <AIChat content={e.content} /> 
+              ? <AIChat content={e.content} loading={e.loading} />
               : <MyChat content={e.content} />
           ))}
         </ChatContainer>
         <InputBarWrapper move={move}>
-          <InputBar handleSend={send} />
+          <InputBar handleSend={send} say={sayChat}/>
         </InputBarWrapper>
       </Container>
   )

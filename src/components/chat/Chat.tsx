@@ -1,7 +1,8 @@
 import InputBar from "../inputBar/InputBar"
 import * as S from "./style"
 import chatBotProfile from "../..//assets/chatBotProfile.png"
-import type { Queryfunc } from "../../types/function"
+import { bouncy } from 'ldrs'
+bouncy.register();
 
 export function FirstChat() {
   return(
@@ -19,14 +20,24 @@ export function MyChat({content}: {content: string}) {
   )
 }
 
-export function AIChat({content}: {content: string}) {
+export function AIChat({ content, loading }: { content: string; loading?: boolean }) {
   return(
     <S.ChatBox $AI={true}>
       <S.AIChatContainer>
         <img src={chatBotProfile} />
         <S.AIChatContent>
           <S.AIName>마루</S.AIName>
-          <S.Chat $AI={true}>{content}</S.Chat>
+          <S.Chat $AI={true}>
+            {loading ? (
+              <l-bouncy
+                size="30"
+                speed="2.0" 
+                color="#3F3F46" 
+              ></l-bouncy>
+            ) : (
+              content
+            )}
+          </S.Chat>
         </S.AIChatContent>
       </S.AIChatContainer>
     </S.ChatBox>

@@ -3,10 +3,17 @@ import sendButton from "../../assets/sendButton.png"
 import { useState } from "react"
 import type { Queryfunc } from "../../types/function";
 
-export default function InputBar({handleSend}: Queryfunc) {
+interface InputBarProps extends Queryfunc {
+  say?: boolean;  // ← 추가
+}
+
+export default function InputBar({handleSend, say}: InputBarProps) {
   const [query, setQuery] = useState<string>("");
 
   function send() {
+    if(say){
+      return;
+    }
     handleSend?.(query);
     setQuery("");
   }
@@ -19,7 +26,7 @@ export default function InputBar({handleSend}: Queryfunc) {
         onChange={(e) => setQuery(e.target.value)}
         title="sadasd"
         onKeyDown={(e) => {
-          if(e.key === "Enter"){
+          if(e.key === "Enter" && !say){
             send();
           }
         }}
