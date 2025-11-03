@@ -58,7 +58,8 @@ export const Button = styled.div<Allow>`
   color: ${({status}) => status === true ? "#ffffff" : "#ADADAD"};
   pointer-events: ${({status}) => status === true ? "auto" : "none"};
   cursor: ${({status}) => status === true ? "pointer" : "not-allowed"};
-  /*이거 커서 부모로 뺴서 거기서 처리하게 해야 함 안그럼 pointer-events 기본 값에 잡아먹힘*/
+  /*이거 커서 부모로 뺴서 거기서 처리하게 해야 함 안그럼 pointer-events 기본 값에 잡아먹힘
+  예전에 적은 거라 뭔지 기억 안남;;*/
 `
 
 export const BookImg = styled.img`

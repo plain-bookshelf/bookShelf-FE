@@ -21,13 +21,12 @@ export type MyBook = {
 }
 
 export type RecommandBook = {
+  id: number;
   img: string;
   title: string;
   book_date: number;
-  book_publisher: string;
-  book_author: string;
-  summary: string;
+  publisher: string;
+  writer: string;
+  description: string;
   possession: boolean;
-  borrow: boolean;
-  reserve: boolean;
 }
