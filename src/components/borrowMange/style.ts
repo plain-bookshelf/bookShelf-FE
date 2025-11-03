@@ -33,6 +33,12 @@ export const Info = styled(Category)<Text>`
   font-weight: ${({ weight }) => weight};
 `
 
+export const overdueInfo = styled(Category)<State>`
+  color: ${({ overdue }) => overdue ? "#FF0000" : "#444444"};
+  font-size: ${({ overdue }) => overdue ? 17 : 20 };
+  font-weight: ${({ overdue }) => overdue ? 600 : 500 };
+`
+
 export const AllowButtonBox = styled.div`
   width: 100px;
   display: flex;
@@ -58,4 +64,8 @@ type Width = {
 type Text = {
   weight: 600 | 500;
   color: "black" | "#5D5D5D" | "#7A7886";
+}
+
+type State = {
+  overdue: boolean;
 }
