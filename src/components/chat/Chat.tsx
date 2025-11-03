@@ -13,20 +13,20 @@ export function FirstChat() {
 
 export function MyChat({content}: {content: string}) {
   return(
-    <S.ChatBox AI={false}>
-      <S.Chat AI={false}>{content}</S.Chat>
+    <S.ChatBox $AI={false}>
+      <S.Chat $AI={false}>{content}</S.Chat>
     </S.ChatBox>
   )
 }
 
 export function AIChat({content}: {content: string}) {
   return(
-    <S.ChatBox AI={true}>
+    <S.ChatBox $AI={true}>
       <S.AIChatContainer>
         <img src={chatBotProfile} />
         <S.AIChatContent>
           <S.AIName>마루</S.AIName>
-          <S.Chat AI={true}>{content}</S.Chat>
+          <S.Chat $AI={true}>{content}</S.Chat>
         </S.AIChatContent>
       </S.AIChatContainer>
     </S.ChatBox>

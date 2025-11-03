@@ -13,9 +13,9 @@ export default function Router() {
         <Route path="/" element={<Layout />} >
           <Route path="/" element={<Main />} />
           <Route path="/my" element={<My />} />
-          <Route path="recommand" element={<RecommandList />} />
-          <Route path="chat" element={<ChatBot />} />
-          <Route path="allow" element={<BorrowAllow />} />
+          <Route path="/recommand" element={<RecommandList />} />
+          <Route path="/chat" element={<ChatBot />} />
+          <Route path="/allow" element={<BorrowAllow />} />
         </Route>
       </Routes>
     </BrowserRouter>

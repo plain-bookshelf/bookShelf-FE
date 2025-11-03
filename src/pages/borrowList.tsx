@@ -1,22 +1,21 @@
-import { useContext } from "react";
-import { CategoryBox, InfoBox } from "../components/borrowMange/borrowManage";
+import { CategoryBox, InfoBox } from "../components/borrowList/BorrowList";
 import styled from "styled-components";
 import PaginationBar from "../components/pagination/PaginationBar";
-import { useManage } from "../components/contexts/ManagementContext";
+import { useList } from "../components/contexts/BorrowListContext";
 
 export default function List() {
-  const {manageData} = useManage();
+  const {listData} = useList();
 
   return(
     <>
       <Container>
         <CategoryBox />
-        {manageData.map((e) => (
+        {listData.map((e) => (
           <InfoBox
             title={e.title}
             registerNumber={e.registerNumber}
             userName={e.userName}
-            requestDate={e.requestDate}
+            rentalDate={e.rentalDate}
           />
         ))}
       </Container>
