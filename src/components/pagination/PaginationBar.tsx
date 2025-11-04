@@ -1,27 +1,8 @@
-import { useContext, useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
-import { ManagementContext, useManage } from "../contexts/ManagementContext";
 import "./PaginationBar.css";
 import paginationArrow from "../../assets/paginationArrow.png"
-import { Route } from "react-router-dom";
 
-export default function PaginationBar() {
-  const {manageData} = useManage(); //어제 데이터 렌더링은 페이지에서 map 돌릴 거니까 정보 받아와서 ContextApi로 수정만 해주면 될듯?
-  const [currentPage, setCurrentPage] = useState(0);
-  const [pageCount, setPageCount] = useState(manageData.length); //처음 페이지 렌더링 할 때 총 데이터 개수나 페이지 개수 받아야 함
-  
-  const fetchItem = async (page: number) => {
-    /*서버랑 통신해서 아이템 가져와야 함*/
-  }
-
-  useEffect(() => {
-    fetchItem(currentPage);
-  }, [currentPage]);
-
-  const handlePageClick = (event: any) => {
-    setCurrentPage(event.selected)
-  }
-
+export default function PaginationBar({ pageCount, onPageChange }: any) {
   return(
       <ReactPaginate
         previousLabel={<img src={paginationArrow} />}
@@ -30,7 +11,7 @@ export default function PaginationBar() {
         pageCount={pageCount}
         marginPagesDisplayed={2}
         pageRangeDisplayed={5}
-        onPageChange={handlePageClick}
+        onPageChange={e => onPageChange(e.selected)}
         containerClassName={"pagination"}
         pageClassName={"page-item"}
         pageLinkClassName={"page-link"}
@@ -42,6 +23,5 @@ export default function PaginationBar() {
         breakLinkClassName={"page-link"}
         activeClassName={"active"}
       />
-
   )
 }

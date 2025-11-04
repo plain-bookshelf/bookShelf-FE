@@ -8,5 +8,5 @@ export type  BorrowList = {
 
 export type BorrowListContextType = {
   listData: BorrowList[];
-  setListData: (manageData: BorrowList) => void
+  setListData: (manageData: BorrowList[]) => void
 }

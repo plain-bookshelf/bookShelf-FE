@@ -7,5 +7,5 @@ export type  BorrowAllow = {
 
 export type ManagementContextType = {
   manageData: BorrowAllow[];
-  setManageData: (manageData: BorrowAllow) => void
+  setManageData: (manageData: BorrowAllow[]) => void
 }
