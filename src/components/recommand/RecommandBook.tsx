@@ -14,7 +14,7 @@ export default function Recoomand(Book: RecommandBook) {
             {Book.book_date}  
           </S.PublicationInfo>
           <S.BookSummary>{Book.description}</S.BookSummary>
-          <S.Possession status={Book.possession}>우리학교</S.Possession>
+          <S.Possession status={Book.is_school}>우리학교</S.Possession>
         </S.BookContent>
       </S.BookBox>
     </>
