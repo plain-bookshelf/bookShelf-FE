@@ -28,5 +28,5 @@ export type RecommandBook = {
   publisher: string;
   writer: string;
   description: string;
-  possession: boolean;
+  is_school: boolean;
 }

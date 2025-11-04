@@ -12,6 +12,7 @@ export default function RecommandList() {
   useEffect(() => {
     const fetchData = async () => {
       try{
+        console.log("요청 보냄");
         const res = await postRecommand(user.id);
         setRecommandBooks(res.data);
       } catch(error) {
@@ -34,7 +35,7 @@ export default function RecommandList() {
             publisher={e.publisher}
             book_date={e.book_date}
             description={e.description}
-            possession={e.possession}
+            is_school={e.is_school}
           ></Recoomand>
         ))}
       </Container>
