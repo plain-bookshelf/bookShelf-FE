@@ -3,6 +3,7 @@ export type  BorrowList = {
   registerNumber: string;
   userName: string;
   rentalDate: string;
+  overdue: boolean;
 }
 
 export type BorrowListContextType = {

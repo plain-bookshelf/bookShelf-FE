@@ -3,7 +3,7 @@ import styled from "styled-components";
 import PaginationBar from "../components/pagination/PaginationBar";
 import { useList } from "../components/contexts/BorrowListContext";
 
-export default function List() {
+export default function BorrowList() {
   const {listData} = useList();
 
   return(
@@ -16,6 +16,7 @@ export default function List() {
             registerNumber={e.registerNumber}
             userName={e.userName}
             rentalDate={e.rentalDate}
+            overdue={e.overdue}
           />
         ))}
       </Container>

@@ -1,10 +1,9 @@
-import { useContext } from "react";
 import { CategoryBox, InfoBox } from "../components/borrowMange/borrowManage";
 import styled from "styled-components";
 import PaginationBar from "../components/pagination/PaginationBar";
 import { useManage } from "../components/contexts/ManagementContext";
 
-export default function List() {
+export default function AllowList() {
   const {manageData} = useManage();
 
   return(
