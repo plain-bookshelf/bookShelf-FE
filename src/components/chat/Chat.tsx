@@ -27,12 +27,12 @@ export function AIChat({ content, loading }: { content: string; loading?: boolea
         <img src={chatBotProfile} />
         <S.AIChatContent>
           <S.AIName>마루</S.AIName>
-          <S.Chat $AI={true}>
+          <S.Chat $AI={true} style={{backgroundColor: "white"}}>
             {loading ? (
               <l-bouncy
-                size="30"
+                size="40"
                 speed="2.0" 
-                color="#3F3F46" 
+                color="#00C471" 
               ></l-bouncy>
             ) : (
               content

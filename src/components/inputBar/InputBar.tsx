@@ -1,5 +1,6 @@
 import * as S from "./style"
 import sendButton from "../../assets/sendButton.png"
+import unSendButton from "../../assets/unSendButton.png"
 import { useState } from "react"
 import type { Queryfunc } from "../../types/function";
 
@@ -31,7 +32,7 @@ export default function InputBar({handleSend, say}: InputBarProps) {
           }
         }}
       />
-      <img src={sendButton} onClick={send} style={{width: 40, height: 40, cursor: "pointer"}} />
+      {say ? <img src={unSendButton} style={{width: 40, height: 40, cursor: "not-allowed"}} /> : <img src={sendButton} onClick={send} style={{width: 40, height: 40, cursor: "pointer"}} />}
     </S.InputContainer>
   )
 }
