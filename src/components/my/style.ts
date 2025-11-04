@@ -202,23 +202,44 @@ export const EditInputBox = styled.div`
 `
 
 export const EditInputTitle = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 20px;
   font-weight: 700;
   color: #5A5A5A;
 `
 
-export const EditInput = styled.input<Color>`
+export const EditBox = styled.div`
+  display: flex;
+  align-items: center;
+  position: relative;
+`
+
+export const EditGo = styled.span<How>`
+  position: absolute;
+  font-size: 20px;
+  font-weight: 500;
+  color: #5A5A5A;
+  text-decoration: underline;
+  left: ${(props) => `${props.go}px`};
+`
+
+export const EditInput = styled.input<Input>`
+  display: flex;
+  justify-content: flex-end;
   box-sizing: border-box;
   width: 700px;
   height: 64px;
   padding: 20px;
   font-size: 20px;
-  font-weight: 600;
-  color: #5A5A5A;
   border: 1px solid #5A5A5A;
   border-radius: 10px;
   outline: none;
-  background-color: ${(props) => props.color};
+  pointer-events: ${(props) => props.allow ? "auto" : "none"};
+  font-weight: ${(props) => props.weight};
+  color: ${(props) => props.color};
+  background-color: ${(props) => props.bgColor};
 `
 
 export const Button = styled.button`
@@ -235,4 +256,15 @@ export const Button = styled.button`
 
 type Color = {
   color: string
+}
+
+type Input = {
+  bgColor: string;
+  color: string;
+  weight: number;
+  allow: boolean;
+}
+
+type How = {
+  go: number;
 }
