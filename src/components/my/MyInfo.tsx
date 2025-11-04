@@ -5,6 +5,8 @@ import userInfoedit from "../../assets/userInfoEdit.png"
 import userImgEdit from "../../assets/userImgEdit.png"
 import { useUser } from "../contexts/UserContext";
 import EditModal from "../modal/styleA/EditModal";
+import lock from "../../assets/lock.png"
+import go from "../../assets/go.png"
 
 export default function MyProfile() {
   const { user } = useUser();
@@ -17,7 +19,6 @@ export default function MyProfile() {
   const [edit, setEdit] = useState(false);
   const [editImgModal, setEditImgModal] = useState(false);
   const [editName, setEditName] = useState(user.name);
-  const [editPassword, setEditPassword] = useState("");
 
   return(
     <>
@@ -112,22 +113,60 @@ export default function MyProfile() {
           {edit && <S.EditContainer>
             <S.EditTitle>유저 정보</S.EditTitle>
               <S.EditInputContainer>
-              <S.EditInputBox>
-                <S.EditInputTitle>닉네임</S.EditInputTitle>
-                <S.EditInput
-                  color="#ffffff"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}></S.EditInput>
-              </S.EditInputBox>
-              <S.EditInputBox>
-                <S.EditInputTitle>이메일</S.EditInputTitle>
-                <S.EditInput
-                  color="#ffffff"
-                  value={editPassword}
-                  onChange={(e) => setEditPassword(e.target.value)}
-                ></S.EditInput>
-              </S.EditInputBox>
-            </S.EditInputContainer>
+                <S.EditInputBox>
+                  <S.EditInputTitle>닉네임</S.EditInputTitle>
+                  <S.EditInput
+                    allow={true}
+                    weight={600}
+                    color="#5A5A5A"
+                    bgColor="#ffffff"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                  />
+                </S.EditInputBox>
+                {user.email === "" ? 
+                <S.EditInputBox style={{cursor: "pointer"}}>
+                  <S.EditInputTitle>이메일</S.EditInputTitle>
+                  <S.EditBox>
+                    <S.EditInput
+                      allow={false}
+                      weight={600}
+                      bgColor="#ffffff"
+                      color="#5A5A5A"
+                      value="등록된 이메일 없습니다."
+                    />
+                    <S.EditGo go={571}>등록 하러가기</S.EditGo>
+                  </S.EditBox>
+                </S.EditInputBox>
+                : 
+                <S.EditInputBox style={{cursor: "not-allowed"}}>
+                  <S.EditInputTitle>이메일</S.EditInputTitle>
+                  <S.EditBox>
+                    <S.EditInput
+                    allow={false}
+                    weight={600}
+                    bgColor="#f0f0f0"
+                    color="#5A5A5A"
+                    value={user.email}
+                  />
+                  </S.EditBox>
+                </S.EditInputBox>}
+                <S.EditInputBox>
+                  <S.EditInputTitle><img src={lock} />비밀번호</S.EditInputTitle>
+                  <S.EditBox>
+                    <S.EditInput
+                      readOnly
+                      allow={true}
+                      weight={500}
+                      bgColor="#f0f0f0"
+                      color="#5A5A5A"
+                      value="비밀번호 재설정 하러가기"
+                      style={{cursor: "pointer"}}
+                    />
+                    <S.EditGo go={653}><img src={go} style={{cursor: "pointer"}} /></S.EditGo>
+                  </S.EditBox>
+                </S.EditInputBox>
+              </S.EditInputContainer>
             <S.Button>확인</S.Button>
           </S.EditContainer>}
           {editImgModal && <EditModal onClose={() => setEditImgModal(false)}/>}
