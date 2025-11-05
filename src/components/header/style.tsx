@@ -62,6 +62,18 @@ export const MyPage = styled.a`
   }
 `
 
+export const AiPage = styled.a`
+  width: 80px;
+  height: 27px;
+
+  font-size: 18px;
+  font-weight: 700;
+  color: black;
+  text-decoration: none;
+
+  cursor: pointer;
+`
+
 export const TextContent = styled.div`
   width: 226px;
   height: 45px;

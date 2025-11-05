@@ -1,7 +1,7 @@
-import * as S from "./style"
-import logo from "../../assets/logo.png";
+import * as S from "./style";
+import headerLogo from "../../assets/headerLogo.svg";
+import user from "../../assets/user.svg"; 
 import home from "../../assets/home.png";
-import user from "../../assets/user.png"; 
 import { useNavigate } from "react-router-dom";
 
 function Header() {
@@ -10,11 +10,12 @@ function Header() {
   return (
     <>
       <S.Container>
-        <S.Logo src={logo} alt="bookShlf-logo" onClick={() => navigate("/")} />
+        <S.Logo src={headerLogo} alt="bookShlf-logo" onClick={() => navigate("/")} />
         <S.PageContent>
           <S.BookRequest onClick={() => navigate("/temp")}>도서신청</S.BookRequest>
           <S.FindFavoriteBooks onClick={(() => navigate("/recommand"))}>내 취향 도서 찾기</S.FindFavoriteBooks>
           <S.MyPage onClick={() => navigate("/My")}>마이페이지</S.MyPage>
+          <S.AiPage onClick={() => navigate("/Ai")}>마루 Ai</S.AiPage>
         </S.PageContent>
         <S.TextContent>
           <S.SignUpContent>
@@ -31,6 +32,4 @@ function Header() {
   )
 }
 
-
-export default Header
-
+export default Header;

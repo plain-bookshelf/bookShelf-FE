@@ -1,4 +1,5 @@
 import * as S from "./style";
+
 import { BookNumber } from "../my/style";
 import type { Book, PopularBook } from "../../types/Book";
 import type { ReactNode } from "react";
@@ -7,6 +8,7 @@ import scrollButton from "../../assets/scrollButton.png"
 import rankUp from "../../assets/rankUp.png"
 import rankDown from "../../assets/rankDown.png"
 import rankUnchanged from "../../assets/rankUnchanged.png"
+
 
 type Props = {
   searchTitle?: string
