@@ -5,7 +5,7 @@ import danger from "../../assets/danger.png";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-export function SignupInput() {
+export function EmailInput() {
   const navigate = useNavigate()
   const [email, setEmail] = useState("")
   const [verificationCode, setVerificationCode] = useState("")
@@ -136,4 +136,4 @@ export function SignupInput() {
   )
 }
 
-export default SignupInput
+export default EmailInput;

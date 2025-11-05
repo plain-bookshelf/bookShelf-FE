@@ -1,15 +1,12 @@
 import { PageWrapper } from '../layouts/pageWrapper';
-import SingupInput from "../components/emailRegistration/EmailInput";
+import EmailInput from "../components/emailRegistration/EmailInput";
 
-
-export default function Singup(){
-
+export default function EmailRegistration(){
   return(
     <>
       <PageWrapper>
-        <SingupInput></SingupInput>
+        <EmailInput></EmailInput>
       </PageWrapper>
     </>
   )
-}
-
+};

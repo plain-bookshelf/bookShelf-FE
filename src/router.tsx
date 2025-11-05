@@ -2,9 +2,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./layouts/Layout";
 import My from "./pages/Mypage";
 import Main from "./pages/Main";
-import Login from "./pages/Login";
+import Login from "./pages/logIn";
 import EmailRegistration from "./pages/EmailRegistration";
-import Singup from "./pages/SignUp"
+import Signup from "./pages/SignUp"
 import IdPasswordFind from "./pages/IdPasswordFind";
 import IdFind from "./pages/IdFind"
 import CheckEmailPwReset from "./pages/CheckEmailPwReset";
@@ -13,18 +13,18 @@ import ShowId from "./pages/ShowId"
 import PwReset from "./pages/PwReset";
 import ShowPw from "./pages/ShowPw";
 import MyPwReset from "./pages/MyPwReset";
-
+import RecommandList from "./pages/Recommand";
 
 export default function Router() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<Layout/>}>
-          <Route path="/" element={<Main />} />
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Main />} />
           <Route path="/My" element={<My />} />
           <Route path="/Login" element={<Login/>}/>
           <Route path="/emailRegistration" element={<EmailRegistration/>}/>
-          <Route path="/signup" element={<Singup/>}/>
+          <Route path="/signup" element={<Signup/>}/>
           <Route path="/idPasswordFind" element={<IdPasswordFind/>}/>
           <Route path="/idFind" element={<IdFind/>}/>
           <Route path="/showId" element={<ShowId/>}/>
@@ -33,6 +33,7 @@ export default function Router() {
           <Route path="/bookdetail" element={<BookDetail/>}/>
           <Route path="/showPw" element={<ShowPw/>}/>
           <Route path="/MyPwReset" element={<MyPwReset/>}/>
+          <Route path="/recommand" element={<RecommandList />} />
         </Route>
       </Routes>
     </BrowserRouter>

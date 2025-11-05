@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import * as S from "./commentFormStyle";
 
-
-
 interface CommentFormProps {
   onAddComment: (text: string) => void;
 }
