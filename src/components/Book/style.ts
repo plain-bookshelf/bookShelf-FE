@@ -5,14 +5,14 @@ export const Title = styled.h1`
   font-size: 36px;
   font-weight: 600;
   color: black;
-  margin: 0 0 75px 240px;
+  margin: 0 0 80px 240px;
 `
 
 export const Container = styled.div`
   display: flex;
   gap: 110px;
   align-items: center;
-  margin: 0 91px 75px 91px;
+  margin: 0 91px;
 `
 
 export const BookContainer = styled.div`
@@ -20,7 +20,9 @@ export const BookContainer = styled.div`
   display: flex;
   gap: 48px;
   width: 1440px;
-  overflow-x: hidden;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
 `
 
 export const Book = styled.div`
@@ -78,9 +80,9 @@ export const Category = styled.span`
 
 export const ScrollButton = styled.div`
   box-sizing: border-box;
-  width: 40px;
-  height: 70px;
-  background-color: #EDEDED;
+  width: 48px;
+  height: 48px;
+  background-color: #DBFFEF;
   border-radius: 20px;
   display: flex;
   justify-content: center;
@@ -108,10 +110,16 @@ export const ChangeRankText = styled.span<TextColor>`
   color: ${(props) => props.color};
 `
 
+export const LineContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`
+
 export const Line = styled.div`
+  width: 1360px;
   height: 1px;
-  background-color: #D5D5D5;
-  margin: 75px 0;
+  background-color: #00C471;
+  margin: 80px 0;
 `
 
 type TextColor={

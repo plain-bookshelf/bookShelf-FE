@@ -15,6 +15,11 @@ import ShowPw from "./pages/showPw";
 import MyPwReset from "./pages/myPwReset";
 
 
+import My from "./pages/Mypage";
+import Main from "./pages/Main";
+import Layout from "./layouts/Layout";
+import RecommandList from "./pages/Recommand";
+
 export default function Router() {
   return (
     <BrowserRouter>
@@ -33,6 +38,10 @@ export default function Router() {
           <Route path="/bookdetail" element={<BookDetail/>}/>
           <Route path="/showPw" element={<ShowPw/>}/>
           <Route path="/MyPwReset" element={<MyPwReset/>}/>
+        <Route path="/" element={<Layout />}>
+          <Route path="/" element={<Main />} />
+          <Route path="/my" element={<My />} />
+          <Route path="/recommand" element={<RecommandList />} />
         </Route>
       </Routes>
     </BrowserRouter>
