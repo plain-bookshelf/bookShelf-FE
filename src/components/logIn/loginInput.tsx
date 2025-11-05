@@ -2,7 +2,7 @@ import * as S from "./style";
 import user from '../../assets/user.png';
 import lock from '../../assets/lock.png';
 
-export function LogInInPut(){
+export function LoginInput(){
   return(
     <>
       <S.LogInContent>
@@ -37,4 +37,4 @@ export function LogInInPut(){
 }
 
 
-export default LogInInPut;
+export default LoginInput;

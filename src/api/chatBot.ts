@@ -1,4 +1,4 @@
-export const postMessage = async (userId: number, content: string, onChunk?: (text: string) => void) => {
+export const postMessage = async (userId: string, content: string, onChunk?: (text: string) => void) => {
   const res = await fetch("http://192.168.1.15:8000/Bookshelf_AI", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
