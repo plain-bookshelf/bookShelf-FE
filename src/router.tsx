@@ -3,16 +3,16 @@ import Layout from "./layouts/Layout";
 import My from "./pages/Mypage";
 import Main from "./pages/Main";
 import Login from "./pages/logIn";
-import EmailRegistration from "./pages/EmailRegistration";
+import EmailRegistration from "./pages/emailRegistration";
 import Signup from "./pages/SignUp"
-import IdPasswordFind from "./pages/IdPasswordFind";
-import IdFind from "./pages/IdFind"
-import CheckEmailPwReset from "./pages/CheckEmailPwReset";
+import IdPasswordFind from "./pages/idPasswordFind";
+import IdFind from "./pages/idFind"
+import CheckEmailPwReset from "./pages/checkEmailPwReset";
 import BookDetail from "./pages/BookDetail";
-import ShowId from "./pages/ShowId"
-import PwReset from "./pages/PwReset";
-import ShowPw from "./pages/ShowPw";
-import MyPwReset from "./pages/MyPwReset";
+import ShowId from "./pages/showId"
+import PwReset from "./pages/pwReset";
+import ShowPw from "./pages/showPw";
+import MyPwReset from "./pages/myPwReset";
 import RecommandList from "./pages/Recommand";
 
 export default function Router() {
