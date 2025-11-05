@@ -1,40 +1,72 @@
-import * as S from "./style";
-import user from '../../assets/user.png';
+import * as S from "./style"
+import user from '../../assets/user.svg';
 import lock from '../../assets/lock.png';
+import noneSee from '../../assets/noneSee.png';
+import see from '../../assets/see.png';
+import danger from '../../assets/danger.png';
+import { useState } from "react";
 
 export function LoginInput(){
   return(
     <>
-      <S.LogInContent>
-        <S.TextContent>
-          <S.LogInText>로그인</S.LogInText>
-          <S.LinkContent>
-            <S.IdPasswordFind href="">아이디/비밀번호 찾기</S.IdPasswordFind>
-            <S.SignUpText href="">회원가입</S.SignUpText>
-          </S.LinkContent>
-        </S.TextContent>
-        <S.InputContent>
-          <S.IdInputContent>
+        <S.LogInContent>
+          <S.TextContainer>
+            <S.TextContent>
+              <S.LogInText>로그인</S.LogInText>
+              <S.LinkContent>
+                <S.IdPasswordFind to="/idPasswordFind">아이디/비밀번호 찾기</S.IdPasswordFind>
+                <S.SignUpText to="/emailRegistration">계정이 없으신가요?</S.SignUpText>
+              </S.LinkContent>
+            </S.TextContent>
+          </S.TextContainer>
+          <S.InputContainer as="form" onSubmit={handleSubmit}>
+            <S.IdInputContainer>
               <S.IdInputTextContent>
-                <S.IdInputImg src={user}/>
+                <S.IdInputImg src={user} alt="user icon" />
                 <S.IdInputText>아이디</S.IdInputText>
               </S.IdInputTextContent>
-              <S.IdInput type="search" placeholder="아이디를 입력하세요."/>
-          </S.IdInputContent>
-          <S.PasswordInputContent>
-            <S.PasswordInputTextContent>
-              <S.PasswordInputImg src={lock}/>
-              <S.PasswordInputText>비밀번호</S.PasswordInputText>
-            </S.PasswordInputTextContent>
-            <S.PasswordInput type="password" placeholder="비밀번호를 입력하세요."/>
-          </S.PasswordInputContent>
-          <S.Button>로그인</S.Button>
-        </S.InputContent>
-      </S.LogInContent>
-
+              <S.IdInputContent hasError={loginError}>
+                <S.IdInput
+                  type="text"
+                  placeholder="아이디 또는 이메일을 입력해 주세요"
+                  value={identifier}
+                  onChange={(e) => onEmailChange(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  disabled={isLoading}
+                />
+              </S.IdInputContent>
+            </S.IdInputContainer>
+            <S.PasswordInputContainer>
+              <S.PasswordInputTextContent>
+                <S.PasswordInputImg src={lock} alt="lock icon"/>
+                <S.PasswordInputText>비밀번호</S.PasswordInputText>
+              </S.PasswordInputTextContent>
+              <S.PasswordInputContent hasError={loginError}>  
+                <S.PasswordInput
+                  type= {showPassword ? "text" : "password"}
+                  placeholder="비밀번호를 입력해 주세요"
+                  value={password}
+                  onChange={(e) => onPasswordChange(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  disabled={isLoading}
+                />
+              {password.length > 0 && 
+              <S.SeeButton 
+                src={showPassword ? see : noneSee}
+                onClick={togglePasswordVisibility}
+                hasError={loginError}
+              />}
+              </S.PasswordInputContent>
+            </S.PasswordInputContainer>
+            {error && <S.ErrorMessageContent>
+              <img src={danger}/>
+              <S.ErrorMessage>{error}</S.ErrorMessage>
+            </S.ErrorMessageContent>}
+            <S.Button type="submit" onClick={onSubmit} disabled={isLoading}>로그인</S.Button>
+          </S.InputContainer>
+        </S.LogInContent>
     </>
-  );
+  )
 }
-
 
 export default LoginInput;
