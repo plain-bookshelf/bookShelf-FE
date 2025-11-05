@@ -1,4 +1,3 @@
-import InputBar from "../inputBar/InputBar"
 import * as S from "./style"
 import chatBotProfile from "../..//assets/chatBotProfile.png"
 import { bouncy } from 'ldrs'
