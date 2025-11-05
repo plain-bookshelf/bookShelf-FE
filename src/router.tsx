@@ -2,17 +2,17 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./layouts/Layout";
 import My from "./pages/Mypage";
 import Main from "./pages/Main";
-import Login from "./pages/login";
-import EmailRegistration from "./pages/emailRegistration";
-import Singup from "./pages/singup"
-import IdPasswordFind from "./pages/idPasswordFind";
-import IdFind from "./pages/idFind"
-import CheckEmailPwReset from "./pages/checkEmailPwReset";
+import Login from "./pages/Login";
+import EmailRegistration from "./pages/EmailRegistration";
+import Singup from "./pages/SignUp"
+import IdPasswordFind from "./pages/IdPasswordFind";
+import IdFind from "./pages/IdFind"
+import CheckEmailPwReset from "./pages/CheckEmailPwReset";
 import BookDetail from "./pages/BookDetail";
-import ShowId from "./pages/showId"
-import PwReset from "./pages/pwReset";
-import ShowPw from "./pages/showPw";
-import MyPwReset from "./pages/myPwReset";
+import ShowId from "./pages/ShowId"
+import PwReset from "./pages/PwReset";
+import ShowPw from "./pages/ShowPw";
+import MyPwReset from "./pages/MyPwReset";
 
 
 export default function Router() {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import CommentForm from './commentForm';
-import CommentList from './commentList';
-import * as S from '../bookDetail/bookDetailStyle';
+import CommentForm from './CommentForm';
+import CommentList from './CommentList';
+import * as S from '../bookDetail/style';
 import type { Comment } from '../../types/bookTypes';
 import userProfile  from '../../assets/userProfile.jpg';
 

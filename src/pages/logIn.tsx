@@ -1,9 +1,9 @@
-import LogInInfo from "../components/login/loginInput"
+import LoginInput from "../components/login/loginInput";
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { PageWrapper } from '../layouts/pageWrapper';
 
-export default function LogIn() {
+export default function Login() {
   const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -55,7 +55,7 @@ export default function LogIn() {
   return (
     <>
       <PageWrapper>
-        <LogInInfo
+        <LoginInput
           identifier={identifier}
           password={password}
           error={error}

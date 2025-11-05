@@ -1,5 +1,5 @@
 import * as S from "./style";
-import { BookNumber } from "../MyPage/style";
+import { BookNumber } from "../myPage/style";
 import type { Book, PopularBook } from "../../type";
 import type { ReactNode } from "react";
 import { useRef } from "react";

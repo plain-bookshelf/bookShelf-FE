@@ -1,5 +1,5 @@
 import { PageWrapper } from "../layouts/pageWrapper"
-import SingupInput from "../components/signup/singupInput"
+import SignupInput from "../components/signup/SignupInput"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 
@@ -160,7 +160,7 @@ export default function Singup() {
   return (
     <>
       <PageWrapper>
-        <SingupInput
+        <SignupInput
           username={username}
           password={password}
           confirmPassword={confirmPassword}

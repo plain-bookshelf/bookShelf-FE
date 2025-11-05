@@ -1,4 +1,4 @@
-import * as S from "./style"
+import * as S from "./style";
 import user from '../../assets/user.svg';
 import lock from '../../assets/lock.png';
 import noneSee from '../../assets/noneSee.png';
@@ -18,7 +18,7 @@ interface LoginInputProps {
   isLoading: boolean
 }
 
-export function LoginInPut({
+export function LoginInput({
   identifier,
   password,
   error,
@@ -106,4 +106,4 @@ export function LoginInPut({
   )
 }
 
-export default LoginInPut
+export default LoginInput;

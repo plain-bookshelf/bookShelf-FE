@@ -1,8 +1,8 @@
-import SearchBar from "../components/SearchBar/SearchBar"
-import * as B from "../components/Book/Book"
+import SearchBar from "../components/searchBar/SearchBar"
+import * as B from "../components/book/Book"
 import type { Book, PopularBook } from "../type"
 import { useState } from "react"
-import { Line } from "../components/Book/style"
+import { Line } from "../components/book/style"
 
 function temp(a: string){
   a+1
