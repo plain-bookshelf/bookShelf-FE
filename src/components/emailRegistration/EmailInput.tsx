@@ -1,61 +1,104 @@
 import * as S from "./EmailInputStyle";
 import letter from "../../assets/letter.png";
 import danger from "../../assets/danger.png";
-
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { sendEmailVerification, verifyEmailCode } from "../../api/emailRegistrationApi"; 
 
-export function SignupInput() {
+
+export function EmailInput() {
   const navigate = useNavigate()
   const [email, setEmail] = useState("")
   const [verificationCode, setVerificationCode] = useState("")
   const [isVerificationSent, setIsVerificationSent] = useState(false)
   const [isVerified, setIsVerified] = useState(false)
-  const [generatedCode, setGeneratedCode] = useState("")
+
   const [verificationError, setVerificationError] = useState("")
   const [emailError, setEmailError] = useState(false)
+  const [isRequesting, setIsRequesting] = useState(false)
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[a-z0-9+-_@.]+@[a-z0-9-]+\.[a-z0-9-.]+$/
     return emailRegex.test(email)
   }
 
-  const handleVerificationRequest = () => {
-    if (email) {
-      if (!validateEmail(email)) {
-        setEmailError(true)
-        return
-      }
+  // 이메일 인증 요청 (POST /email/send)
+  const handleVerificationRequest = async () => { 
+    if (!email || isRequesting || isVerificationSent) return;
 
-      setEmailError(false)
-      const code = Math.floor(100000 + Math.random() * 900000).toString()
-      setGeneratedCode(code)
+    if (!validateEmail(email)) {
+      setEmailError(true)
+      return
+    }
+
+    setEmailError(false)
+    setIsRequesting(true)
+    setVerificationError("")
+
+    try {
+      const response = await sendEmailVerification(email); 
+
       setIsVerificationSent(true)
-      setVerificationError("") // 인증 요청 시 이전 인증 오류 초기화
+      setVerificationError("")
 
-      console.log("생성된 인증번호:", code)
-      console.log("인증 요청 이메일:", email)
-      alert(`인증번호가 이메일로 전송되었습니다.\n(개발 모드: 콘솔에서 인증번호를 확인하세요)`)
+      alert(`인증 요청 성공: ${response.message}`);
+    } catch (error) {
+      console.error("인증 요청 실패:", error);
+      const errorMessage = error instanceof Error ? error.message : "이메일 전송 중 오류 발생";
+      
+      setVerificationError(errorMessage);
+      setEmailError(true);
+
+      setIsVerificationSent(false);
+    } finally {
+      setIsRequesting(false)
     }
   }
 
-  const handleVerification = () => {
-    if (verificationCode) {
-      if (verificationCode === generatedCode) {
-        setIsVerified(true)
-        setVerificationError("")
-        console.log("인증 성공")
-        alert("이메일 인증이 완료되었습니다!")
-        navigate("/signup")
-      } else {
-        setVerificationError("인증번호가 일치하지 않습니다. 다시 확인해주세요.")
-        console.log("인증 실패 - 입력:", verificationCode, "/ 정답:", generatedCode)
-      }
+  // 이메일 인증 확인 (PUT /email/verify)
+  const handleVerification = async () => {
+    if (!email || !verificationCode || !isVerificationSent || isVerified || isRequesting) return;
+    
+    setIsRequesting(true);
+
+    try {
+      const response = await verifyEmailCode(email, verificationCode);
+      
+      // API 호출 성공 및 응답 status가 "success"인 경우
+      setIsVerified(true);
+      setVerificationError("");
+      alert(`인증 성공: ${response.message}`);
+      // navigate("/signup") // 인증 성공 후 바로 이동하려면 주석 해제
+
+    } catch (error) {
+      console.error("인증 확인 실패:", error);
+      const errorMessage = error instanceof Error ? error.message : "인증번호 확인 중 오류 발생";
+      setVerificationError(errorMessage);
+      setIsVerified(false); // 혹시 모를 상황에 대비
+      
+    } finally {
+      setIsRequesting(false);
     }
   }
 
   const handleNext = () => {
-    navigate("/signup")
+      const isEmailProvided = email.trim().length > 0;
+      
+      
+      // 1. 이메일을 입력했는데 인증이 완료되지 않았다면 이동을 막음
+      if (isEmailProvided && !isVerified) {
+          alert("이메일 등록을 진행하려면 이메일 인증을 완료해야 합니다.");
+          return;
+      }
+      
+      // 2. 회원가입 페이지로 이동 시 이메일 데이터(state)를 전달
+      //    이메일을 등록하지 않았다면 (email이 "") 빈 문자열이 전달됩니다.
+      navigate("/signup", { 
+          state: { 
+              emailAddress: email.trim(), // ⬅️ 입력된 이메일 또는 "" 전달
+              isEmailVerified: isVerified && isEmailProvided // 이메일이 있고 인증된 경우만 true
+          } 
+      });
   }
 
   return (
@@ -85,12 +128,16 @@ export function SignupInput() {
                   setEmail(e.target.value)
                   setEmailError(false)
                 }}
-                disabled={isVerificationSent}
+                // 인증 요청이 완료되었거나, 인증이 완료되었거나, API 요청 중일 때 비활성화
+                disabled={isVerificationSent || isVerified || isRequesting} 
               />
             </S.EmailInputDiv>
             
-            <S.EmailCheckButton disabled={!email || isVerificationSent} onClick={handleVerificationRequest}>
-              인증 요청
+            <S.EmailCheckButton 
+              // 이메일이 없거나, 인증 요청이 완료되었거나, API 요청 중일 때 비활성화
+              disabled={!email || isVerificationSent || isVerified || isRequesting} 
+              onClick={handleVerificationRequest}>
+              {isRequesting && !isVerificationSent ? "요청 중..." : "인증 요청"}
             </S.EmailCheckButton>
           </S.EmailInputContent>
         </S.EmailInPutContainer> 
@@ -114,13 +161,14 @@ export function SignupInput() {
                   setVerificationCode(e.target.value)
                   setVerificationError("")
                 }}
-                disabled={!isVerificationSent || isVerified}
+                disabled={!isVerificationSent || isVerified || isRequesting}
               />
             </S.CheckInputDiv>
             <S.CheckButton
-              disabled={!verificationCode || !isVerificationSent || isVerified}
+              // 인증번호가 입력되었고, 인증 요청이 완료되었으며, 아직 인증되지 않았고, API 요청 중이 아닐 때 활성화
+              disabled={!verificationCode || !isVerificationSent || isVerified || isRequesting}
               onClick={handleVerification}>
-              인증하기
+              {isRequesting && isVerificationSent ? "확인 중..." : "인증하기"}
             </S.CheckButton>
           </S.CheckInputContent>
         </S.CheckInPutContainer>
@@ -129,11 +177,9 @@ export function SignupInput() {
             <img src={danger} alt="danger icon"/>
             {verificationError} 
           </S.ErrorMessage>}
-
-        <S.NextButton onClick={handleNext}>다음</S.NextButton>
+        <S.NextButton onClick={handleNext} disabled={email.trim().length > 0 && !isVerified}>다음</S.NextButton>
       </S.InputContainer>
     </S.EmailContent>
   )
 }
-
-export default SignupInput
+export default EmailInput

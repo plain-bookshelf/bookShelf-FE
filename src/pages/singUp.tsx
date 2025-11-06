@@ -2,6 +2,7 @@ import { PageWrapper } from "../layouts/pageWrapper"
 import SingupInput from "../components/signup/singupInput"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import Signup from "../api/signup"
 
 // 허용되는 문자
 const ASCII_REGEX = /[^\x20-\x7F]/
@@ -136,19 +137,31 @@ export default function Singup() {
 
     setIsLoading(true)
 
+    const requsetData = {
+      user_name: username,
+      nick_name: username,
+      password: password,
+      address: "",
+    }
+
     try {
       // (서버 통신 시뮬레이션)
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const userData = await Signup(requsetData)
       
-      console.log("회원가입 데이터:", { username, password, affiliation })
+      console.log("회원가입 데이터:", {userData})
       alert("회원가입이 완료되었습니다!")
 
       setTimeout(() => {
         navigate("/Login")
       }, 100)
     } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "회원가입 중 오류가 발생하였습니다"
+      console.error("🚨 회원가입 실패:", errorMessage);
+      
+      alert(`회원가입 실패: ${errorMessage}`);
+      
       setErrors({
-        username: err instanceof Error ? err.message : "회원가입 중 오류가 발생했습니다.",
+        username: "",
         password: "",
         confirmPassword: "",
       })
