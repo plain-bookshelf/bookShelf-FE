@@ -1,8 +1,8 @@
 import styled from "styled-components";
 
-export const SearchContainer = styled.div<{ $active: boolean }>`
+export const SearchContainer = styled.div<{ $active: boolean } & State>`
   box-sizing: border-box;
-  width: 1440px;
+  width: ${({state}) => state === "book" ? "1440px" : "1118px"};
   height: 64px;
   border: 2px solid
     ${({ $active }) => ($active ? "black" : "#d5d5d5")};
@@ -20,7 +20,7 @@ export const SearchContainer = styled.div<{ $active: boolean }>`
 
 export const SearchBar = styled.input`
   box-sizing: border-box;
-  width: 1200px;
+  width: 100%;
   color: black;
   border: none;
   outline: none;
@@ -51,3 +51,7 @@ export const Title = styled.h1`
   color: black;
   margin: 0 0 75px 240px;
 `
+
+type State = {
+  state: "book" | "user"
+}
