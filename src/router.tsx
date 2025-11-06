@@ -14,6 +14,9 @@ import PwReset from "./pages/pwReset";
 import ShowPw from "./pages/showPw";
 import MyPwReset from "./pages/myPwReset";
 import RecommandList from "./pages/Recommand";
+import ChatBot from "./pages/chatBot";
+import AllowList from "./pages/borrowAllow";
+import BorrowList from "./pages/borrowList";
 
 export default function Router() {
   return (
@@ -34,6 +37,9 @@ export default function Router() {
           <Route path="/showPw" element={<ShowPw/>}/>
           <Route path="/MyPwReset" element={<MyPwReset/>}/>
           <Route path="/recommand" element={<RecommandList />} />
+          <Route path="/AI" element={<ChatBot />} />
+          <Route path="allow" element={<AllowList />} />
+          <Route path="list" element={<BorrowList />} />
         </Route>
       </Routes>
     </BrowserRouter>

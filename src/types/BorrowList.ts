@@ -4,9 +4,11 @@ export type  BorrowList = {
   userName: string;
   rentalDate: string;
   overdue: boolean;
+  allow: boolean;
 }
 
 export type BorrowListContextType = {
   listData: BorrowList[];
-  setListData: (manageData: BorrowList[]) => void
+  setListData: (manageData: BorrowList[]) => void;
+  allowData: (data: BorrowList) => void;
 }

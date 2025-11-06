@@ -5,7 +5,7 @@ import { useList } from "../components/contexts/BorrowListContext";
 import { useState, useEffect } from "react";
 
 export default function BorrowList() {
-  const { listData, setListData } = useList();
+  const { listData } = useList();
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
 
@@ -26,6 +26,7 @@ export default function BorrowList() {
             userName={e.userName}
             rentalDate={e.rentalDate}
             overdue={e.overdue}
+            allow={e.allow}
           />
         ))}
       </Container>
