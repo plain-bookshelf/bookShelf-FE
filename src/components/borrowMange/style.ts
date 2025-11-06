@@ -34,9 +34,9 @@ export const Info = styled(Category)<Text>`
 `
 
 export const overdueInfo = styled(Category)<State>`
-  color: ${({ overdue }) => overdue ? "#FF0000" : "#444444"};
-  font-size: ${({ overdue }) => overdue ? 17 : 20 };
-  font-weight: ${({ overdue }) => overdue ? 600 : 500 };
+  color: ${( props ) => props.overdue ? "#FF0000" : "#444444"};
+  font-size: ${( props ) => props.overdue ? 17 : 20 };
+  font-weight: ${( props ) => props.overdue ? 600 : 500 };
 `
 
 export const AllowButtonBox = styled.div`
@@ -45,13 +45,13 @@ export const AllowButtonBox = styled.div`
   justify-content: center;
 `
 
-export const AllowButton = styled.button`
+export const AllowButton = styled.button<State>`
   width: 89px;
   height: 38px;
   font-size: 17px;
   font-weight: 600;
-  color: #00C471;
-  border: 1px solid #00C471;
+  color: ${(props) => props.allow ? "#ADADAD" : "#00C471"};
+  border: 1px solid ${(props) => props.allow ? "#ADADAD" : "#00C471"};
   border-radius: 10px;
   background-color: #ffffff;
   cursor: pointer;
@@ -67,5 +67,6 @@ type Text = {
 }
 
 type State = {
-  overdue: boolean;
+  overdue?: boolean;
+  allow?: boolean;
 }

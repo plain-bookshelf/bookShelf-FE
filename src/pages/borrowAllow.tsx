@@ -5,7 +5,7 @@ import { useManage } from "../components/contexts/ManagementContext";
 import { useState, useEffect } from "react";
 
 export default function AllowList() {
-  const { manageData, setManageData } = useManage();
+  const { manageData } = useManage();
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
 
@@ -24,6 +24,7 @@ export default function AllowList() {
             registerNumber={e.registerNumber}
             userName={e.userName}
             requestDate={e.requestDate}
+            allow={e.allow}
           />
         ))}
       </Container>
