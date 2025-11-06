@@ -7,9 +7,10 @@ import { useUser } from "../contexts/UserContext";
 import EditModal from "../modal/styleA/EditModal";
 import lock from "../../assets/lock.png"
 import go from "../../assets/go.png"
+import { useNavigate } from "react-router-dom";
 
 export default function MyProfile() {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   const [borrowBooks, setBorrowBooks] = useState<MyBook[]>([{title: "죽고 싶은 아이. 1", state: 3, id: 1},{title: "푸른사자와니니", state: 12, id: 2},{title: "디자인좀 그만 바뀌면", state: 100, id: 3},{title: "디자인좀 그만 바뀌면", state: 100, id: 4}]);
   const [reserveBooks, setReserveBooks] = useState<MyBook[]>([{title: "동이는 장돌뱅...", state: "대여", id: 1,}]);
   const [overdueBooks, setOverdueBooks] = useState<MyBook[]>([{title: "자몽살구클럽", state: 6, id: 1}, {title: "자몽살구클럽", state: 4, id: 2}]);
@@ -19,6 +20,7 @@ export default function MyProfile() {
   const [edit, setEdit] = useState(false);
   const [editImgModal, setEditImgModal] = useState(false);
   const [editName, setEditName] = useState(user.name);
+  const navigate = useNavigate();
 
   return(
     <>
@@ -31,7 +33,7 @@ export default function MyProfile() {
                 <img src={user.img} style={{width: "100px", height: "100px", borderRadius: "50%"}} />
                 <img src={userImgEdit} style={{position: "absolute"}} />
               </S.ProfileOutlien>
-              <div style={{display: "flex", alignItems: "center"}}>
+              <div style={{display: "flex", alignItems: "center", flexWrap: "wrap"}}>
                 <S.InfoTitle color="#00C471">{user.name}</S.InfoTitle>
                 <S.InfoTitle color="black" style={{marginRight: "17px"}}>님의 회원정보</S.InfoTitle>
                 <img src={userInfoedit} onClick={() => setEdit(true)} style={{cursor: "pointer"}} />
@@ -116,6 +118,12 @@ export default function MyProfile() {
                 <S.EditInputBox>
                   <S.EditInputTitle>닉네임</S.EditInputTitle>
                   <S.EditInput
+                    onKeyDown={(e) => {
+                      if(e.key == "Enter"){
+                        setUser({ ...user, name: editName })
+                        setEdit(false)
+                      }
+                    }}
                     allow={true}
                     weight={600}
                     color="#5A5A5A"
@@ -125,7 +133,7 @@ export default function MyProfile() {
                   />
                 </S.EditInputBox>
                 {user.email === "" ? 
-                <S.EditInputBox style={{cursor: "pointer"}}>
+                <S.EditInputBox onClick={() => navigate("/emailRegistration")} style={{cursor: "pointer"}}>
                   <S.EditInputTitle>이메일</S.EditInputTitle>
                   <S.EditBox>
                     <S.EditInput
@@ -153,7 +161,7 @@ export default function MyProfile() {
                 </S.EditInputBox>}
                 <S.EditInputBox>
                   <S.EditInputTitle><img src={lock} />비밀번호</S.EditInputTitle>
-                  <S.EditBox>
+                  <S.EditBox onClick={() => navigate("/idPasswordFind")}>
                     <S.EditInput
                       readOnly
                       allow={true}
@@ -167,7 +175,10 @@ export default function MyProfile() {
                   </S.EditBox>
                 </S.EditInputBox>
               </S.EditInputContainer>
-            <S.Button>확인</S.Button>
+            <S.Button onClick={() => {
+              setUser({ ...user, name: editName })
+              setEdit(false)
+              }}>확인</S.Button>
           </S.EditContainer>}
           {editImgModal && <EditModal onClose={() => setEditImgModal(false)}/>}
       </S.Banner>

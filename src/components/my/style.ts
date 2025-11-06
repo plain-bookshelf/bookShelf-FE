@@ -126,7 +126,7 @@ export const ProfileBox = styled.div`
   display: flex;
   gap: 32px;
   align-items: center;
-  width: 450px;
+  max-width: 600px;
   height: 100px;
 `
 

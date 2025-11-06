@@ -29,7 +29,7 @@ const processQueue = (error: AxiosError | null, token: string | null = null) => 
 
 // 기본 Axios 인스턴스 생성
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: "http:13.125.65.240:8080",
+  baseURL: "http://13.125.65.240:8080",
   headers: {
     'Content-Type': 'application/json',
   },
