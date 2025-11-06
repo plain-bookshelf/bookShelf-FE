@@ -12,3 +12,8 @@ export type BorrowListContextType = {
   setListData: (manageData: BorrowList[]) => void;
   allowData: (data: BorrowList) => void;
 }
+
+export type CheckBoxProps = {
+  checked: boolean;
+  onChange: () => void;
+};

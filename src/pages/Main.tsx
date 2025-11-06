@@ -30,7 +30,7 @@ useEffect(() => {
   }, [])
 
 
-  function temp(content: string){
+  const handleSearch = (content: string) => {
     if(content === ""){
       alert("검색어를 입력해주세요");
       return;
@@ -41,7 +41,7 @@ useEffect(() => {
   }
  
  return(<>
-    <SearchBar handleSearch={temp} />
+    <SearchBar handleSearch={handleSearch} State="book" />
 
     {searchBookList.length !== 0 && search &&
       <div>
