@@ -67,6 +67,12 @@ export const BookImg = styled.img`
   height: 280px;
 `
 
+export const Line = styled.div`
+  width: 100%;
+  height: 1px;
+  background-color: #D5D5D5;
+`
+
 type Allow = {
   status: boolean;
 }

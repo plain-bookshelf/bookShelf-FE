@@ -17,6 +17,7 @@ export default function Recoomand(Book: RecommandBook) {
           <S.Possession status={Book.is_school}>우리학교</S.Possession>
         </S.BookContent>
       </S.BookBox>
+      <S.Line />
     </>
   )
 }

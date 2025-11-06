@@ -59,7 +59,7 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   margin-top: 75px;
-  gap: 70px;
+  gap: 35px;
 `
 
 const LoadingContainer = styled.div`
