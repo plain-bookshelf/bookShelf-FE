@@ -4,10 +4,13 @@ import type { RecommandBook } from "../types/Book"
 import styled from "styled-components";
 import { postRecommand } from "../api/recommand";
 import { useUser } from "../components/contexts/UserContext";
+import { bouncy } from 'ldrs'
+bouncy.register();
 
 export default function RecommandList() {
   const { user } = useUser();
   const [recommandBooks, setRecommandBooks] = useState<RecommandBook[]>([]);
+  const [loading, setloading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -15,6 +18,7 @@ export default function RecommandList() {
         console.log("요청 보냄");
         const res = await postRecommand(user.id);
         setRecommandBooks(res.data);
+        setloading(false);
       } catch(error) {
         console.error(error);
       } 
@@ -39,6 +43,13 @@ export default function RecommandList() {
           ></Recoomand>
         ))}
       </Container>
+      {loading && <LoadingContainer >
+        <l-bouncy
+          size="70"
+          speed="2.0" 
+          color="#00C471" 
+        ></l-bouncy>
+      </LoadingContainer>}
     </>
   )
 }
@@ -49,4 +60,12 @@ const Container = styled.div`
   align-items: center;
   margin-top: 75px;
   gap: 70px;
+`
+
+const LoadingContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 400px;
 `

@@ -1,10 +1,11 @@
 import SearchBar from "../components/searchBar/SearchBar"
 import * as B from "../components/book/Book"
 import type { Book, PopularBook } from "../types/Book"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Line, LineContainer } from "../components/book/style"
 import styled from "styled-components"
 import searchResult from "../assets/searchResult.png"
+import { getMain } from "../api/main"
 
 export default function Main() {
   const [searchBookList, setSearchBookList] = useState<Book[]>([]);
@@ -12,6 +13,22 @@ export default function Main() {
   const [newBookList, setNewBookList] = useState<Book[]>([{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"}]);
   const [search, setSearch] = useState<Boolean>(false);
   const [query, setQuery] = useState<String>("");
+
+useEffect(() => {
+    const fetchData = async () => {
+      try{
+        console.log("요청 보냄");
+        const res = await getMain();
+        setPopularBookList(res.data.book_popularity_list_response_dto);
+        setNewBookList(res.data.book_recent_list_response_dto);
+      } catch(error) {
+        console.error(error);
+      } 
+    }
+
+    fetchData();
+  }, [])
+
 
   function temp(content: string){
     if(content === ""){
@@ -21,7 +38,7 @@ export default function Main() {
 
     setQuery(content);
     setSearch(true);
-  } 
+  }
  
  return(<>
     <SearchBar handleSearch={temp} />

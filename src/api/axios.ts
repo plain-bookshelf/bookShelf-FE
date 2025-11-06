@@ -1,8 +1,12 @@
 import axios from "axios";
 
-//백엔드 서버쪽 용 / ai 통신 용 서버는 알아서
+//백엔드 서버쪽 용 / ai 쪽 통신은 그냥 인스턴스 없이 깡으로 박음
 export const instance = axios.create({
-  baseURL: "http://192.168.1.19:8000",
-  timeout: 9000000000000,
-  headers: { 'Content-Type': 'application/json' },
+  baseURL: "http://13.125.65.240:8080",
+  timeout: 100000000,
+  headers: { 
+    'Content-Type': 'application/json',
+    Authorization: `Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJraW0iLCJhdXRoIjoiUk9MRV9VU0VSIiwiYWZmaWxpYXRpb25JZCI6MSwiZXhwIjoxNzYyNDI5MDM3fQ.9qMZfNgWiaIxZn2IyCXwz_OrWvGNDNnozwKsEFIxeV2uLNp3VgL61mM2DqDpdlqgICa675uvjNuvTk5sSx-Qiw
+`
+  },
 })
