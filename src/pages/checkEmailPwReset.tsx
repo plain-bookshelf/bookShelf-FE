@@ -1,16 +1,14 @@
-
 import { PageWrapper } from "../layouts/pageWrapper"
-import CkeckEmailInput from "../components/emailCheckPwReset/checkEmailInput"
-
+import CheckEmailInput from "../components/emailCheckPwReset/checkEmailInput"
 
 export function CheckEmailPwReset() {
   return(
     <>
       <PageWrapper>
-        <CkeckEmailInput></CkeckEmailInput>
+        <CheckEmailInput></CheckEmailInput>
       </PageWrapper>
     </>
   )
 }
 
-export default CheckEmailPwReset
+export default CheckEmailPwReset;

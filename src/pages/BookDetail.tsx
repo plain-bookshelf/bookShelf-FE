@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import BookInfoSection from '../components/bookDetail/bookInfoSection';
 import CollectionTable from '../components/bookDetail/collectionTable';
-import * as S from '../components/bookDetail/bookDetailStyle';
+import * as S from '../components/bookDetail/style';
 import type { BookDetailData } from '../types/bookTypes';
 import ReviewSection from '../components/comment/ReviewSection'
 

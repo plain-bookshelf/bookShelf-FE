@@ -18,7 +18,7 @@ export const postLogin = async (
 ): Promise<ApiResponse<LoginTokenData>> => {
   try {
     const response = await axios.post<ApiResponse<LoginTokenData>>(
-      `${API_BASE_URL}/login`,
+      `http://13.125.65.240:8080${API_BASE_URL}/login`,
       loginData,
       {
         headers: {

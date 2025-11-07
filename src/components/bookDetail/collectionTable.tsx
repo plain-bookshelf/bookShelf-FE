@@ -1,5 +1,5 @@
 import React from 'react';
-import * as S from './bookDetailStyle';
+import * as S from './style';
 import type { CollectionItem } from '../../types/bookTypes';
 
 interface CollectionTableProps {

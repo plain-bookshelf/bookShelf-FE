@@ -1,5 +1,5 @@
 import { PageWrapper } from "../layouts/pageWrapper"
-import SingupInput from "../components/signup/singupInput"
+import SingupInput from "../components/signup/SignupInput"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Signup from "../api/signup"

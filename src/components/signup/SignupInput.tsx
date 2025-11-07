@@ -1,5 +1,5 @@
 import type React from "react"
-import * as S from "./sinupInputStyle"
+import * as S from "./style"
 import lock from "../../assets/lock.png"
 import user from "../../assets/user.svg"
 import see from "../../assets/see.png"
@@ -28,7 +28,7 @@ interface SingupInputProps {
   isLoading: boolean
 }
 
-export function SingupInput({
+export function SignupInput({
   username,
   password,
   errors,
@@ -181,4 +181,4 @@ export function SingupInput({
   )
 }
 
-export default SingupInput
+export default SignupInput
