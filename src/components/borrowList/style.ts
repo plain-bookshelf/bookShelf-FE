@@ -4,7 +4,7 @@ export const Container = styled.div`
   width: 1440px;
   display: flex;
   justify-content: flex-end;
-  margin: 82px 0 18px 0;
+  margin: 42px 0 18px 0;
 `
 
 export const Box = styled.label`
