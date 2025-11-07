@@ -120,6 +120,10 @@ export default function MyProfile() {
                   <S.EditInput
                     onKeyDown={(e) => {
                       if(e.key == "Enter"){
+                        if(editName.length < 3 || editName.length > 16){
+                          alert("이름은 3 ~ 16자 사이어야 합니다")
+                          return;
+                        }
                         setUser({ ...user, name: editName })
                         setEdit(false)
                       }
@@ -176,6 +180,10 @@ export default function MyProfile() {
                 </S.EditInputBox>
               </S.EditInputContainer>
             <S.Button onClick={() => {
+              if(editName.length < 3 || editName.length > 16){
+                alert("이름은 3 ~ 16자 사이어야 합니다")
+                return;
+              }
               setUser({ ...user, name: editName })
               setEdit(false)
               }}>확인</S.Button>
