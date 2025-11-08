@@ -1,14 +1,8 @@
 import * as S from "./style";
-
-import { BookNumber } from "../my/style";
-import type { Book, PopularBook } from "../../types/Book";
+import type { Book } from "../../types/Book";
 import type { ReactNode } from "react";
 import { useRef, useState, useEffect } from "react";
 import scrollButton from "../../assets/scrollButton.png"
-import rankUp from "../../assets/rankUp.png"
-import rankDown from "../../assets/rankDown.png"
-import rankUnchanged from "../../assets/rankUnchanged.png"
-
 
 type Props = {
   searchTitle?: string
@@ -68,10 +62,19 @@ export const BookList: React.FC<Props> = ({searchTitle, BookListTitle, children}
   </>)
 }
 
-export function Book({title, author, category, img}: Book) {
+export function Book({book_name, book_type, book_image_url, author}: Book) {
+  const book_type_split = book_type.split(">");
+  const category = book_type_split[book_type_split.length-1];
+
+  let title = book_name;
+  
+  if(book_name.length > 8){
+    title = book_name.slice(0, 8) + "...";
+  }
+
   return(<>
     <S.Book>
-      <img src={img}/>
+      <img style={{height: 300}} src={book_image_url}/>
       <S.BookInfo>
         <S.BookTitle>{title}</S.BookTitle>
         <S.Author>{author}</S.Author>
@@ -84,11 +87,20 @@ export function Book({title, author, category, img}: Book) {
   </>)
 }
 
-export function Popular({title, author, category, nowRank, preRank, img}: PopularBook) {
+export function Popular({book_name, book_type, book_image_url, author}: Book) {
+  const book_type_split = book_type.split(">");
+  const category = book_type_split[book_type_split.length-1];
+
+  let title = book_name;
+  
+  if(book_name.length > 8){
+    title = book_name.slice(0, 8) + "...";
+  }
+
   return(<>
     <S.Book>
-      <img src={img}/>
-      <S.RankBox>
+      <img style={{height: 300}} src={book_image_url}/>
+      {/* <S.RankBox>
         <BookNumber style={{margin: 0}}>{nowRank}</BookNumber>
         {preRank - nowRank > 0 && 
         <S.ChangeRankBox>
@@ -103,7 +115,7 @@ export function Popular({title, author, category, nowRank, preRank, img}: Popula
         {preRank - nowRank === 0 && 
           <img src={rankUnchanged}  style={{width: 15, height: 2}}/>
           }
-      </S.RankBox>
+      </S.RankBox> */}
       <S.BookInfo>
         <S.BookTitle>{title}</S.BookTitle>
         <S.Author>{author}</S.Author>

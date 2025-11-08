@@ -1,16 +1,18 @@
 import SearchBar from "../components/searchBar/SearchBar"
 import * as B from "../components/book/Book"
-import type { Book, PopularBook } from "../types/Book"
+import type { Book } from "../types/Book"
 import { useEffect, useState } from "react"
 import { Line, LineContainer } from "../components/book/style"
 import styled from "styled-components"
 import searchResult from "../assets/searchResult.png"
 import { getMain } from "../api/main"
+import { useUser } from "../components/contexts/UserContext"
 
 export default function Main() {
+  const { user, setUser } = useUser();
   const [searchBookList, setSearchBookList] = useState<Book[]>([]);
-  const [popularBookList, setPopularBookList] = useState<PopularBook[]>([{title: "아 제발", author: "아 진짜", category: "암거나", nowRank: 3, preRank: 1, img: "a"}]);
-  const [newBookList, setNewBookList] = useState<Book[]>([{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"},{title: "아 제발", author: "아 진짜", category: "암거나", img: "temp"}]);
+  const [popularBookList, setPopularBookList] = useState<Book[]>([{id: 1, book_name: "공중그네", book_type: "dddd>dddsa>한국소설", book_image_url: "https://image.aladin.co.kr/product/53/67/cover200/895660102x_2.jpg", author: "저자"}]);
+  const [newBookList, setNewBookList] = useState<Book[]>([]);
   const [search, setSearch] = useState<Boolean>(false);
   const [query, setQuery] = useState<String>("");
 
@@ -19,8 +21,10 @@ useEffect(() => {
       try{
         console.log("요청 보냄");
         const res = await getMain();
-        setPopularBookList(res.data.book_popularity_list_response_dto);
-        setNewBookList(res.data.book_recent_list_response_dto);
+        setPopularBookList(res.data.data.book_popularity_list_response_dto);
+        setNewBookList(res.data.data.book_recent_list_response_dto);
+        setUser({...user, img: res.data.data.profile})
+
       } catch(error) {
         console.error(error);
       } 
@@ -49,10 +53,11 @@ useEffect(() => {
         <B.BookList BookListTitle="검색 결과">
           {searchBookList.map((e) => (
           <B.Book
-            title={e.title}
+            id={e.id}
+            book_name={e.book_name}
             author={e.author}
-            category={e.category}
-            img={e.img}
+            book_type={e.book_type}
+            book_image_url={e.book_image_url}
           />
         ))}
         </B.BookList>
@@ -70,12 +75,11 @@ useEffect(() => {
       <B.BookList BookListTitle="인기 도서">
         {popularBookList.map((e) => (
           <B.Popular 
-            title={e.title}
+            id={e.id}
+            book_name={e.book_name}
             author={e.author}
-            category={e.category}
-            nowRank={e.nowRank}
-            preRank={e.preRank}
-            img={e.img}
+            book_type={e.book_type}
+            book_image_url={e.book_image_url}
           />
         ))}
       </B.BookList>
@@ -89,10 +93,11 @@ useEffect(() => {
       <B.BookList BookListTitle="최신 도서">
         {newBookList.map((e) => (
           <B.Book
-            title={e.title}
+            id={e.id}
+            book_name={e.book_name}
             author={e.author}
-            category={e.category}
-            img={e.img}
+            book_type={e.book_type}
+            book_image_url={e.book_image_url}
           />
         ))}
       </B.BookList>

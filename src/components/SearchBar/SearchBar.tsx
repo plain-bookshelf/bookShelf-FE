@@ -1,7 +1,6 @@
 import search from "../../assets/search.png"
 import { useState } from "react"
 import * as S from "./style"
-import type { Queryfunc } from "../../types/function";
 
 type SearchBarProps = {
   handleSearch: (query: string) => void;
