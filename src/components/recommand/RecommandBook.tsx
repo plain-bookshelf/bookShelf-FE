@@ -2,10 +2,12 @@ import * as S from "./style"
 import type { RecommandBook } from "../../types/Book"
 
 export default function Recoomand(Book: RecommandBook) {
+  const bookImgUrl = Book.img.trim();
+
   return (
     <>
       <S.BookBox>
-        <S.BookImg src={Book.img} />
+        <S.BookImg src={bookImgUrl} />
         <S.BookContent>
           <S.BookTitle>{Book.title}</S.BookTitle>
           <S.PublicationInfo>

@@ -37,18 +37,21 @@ export const BookInfo = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex-wrap: wrap;
 `
 
 export const BookTitle = styled.span`
   font-size: 24px;
   font-weight: 600;
   color: black;
+  white-space: pre-wrap;
 `
 
 export const Author = styled.span`
   font-size: 16px;
   font-weight: 400;
   color: #5D5D5D;
+  flex-wrap: wrap;
 `
 
 export const CategoryBox = styled.div`
@@ -56,6 +59,7 @@ export const CategoryBox = styled.div`
   width: 200px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 `
 
 export const CategoryFilter = styled.span`
@@ -76,6 +80,7 @@ export const Category = styled.span`
   font-size: 14px;
   font-weight: 400;
   color: #5D5D5D;
+  flex-wrap: wrap;
 `
 
 export const ScrollButton = styled.div`

@@ -1,5 +1,5 @@
 export const postMessage = async (userId: string, content: string, onChunk?: (text: string) => void) => {
-  const res = await fetch("http://10.84.252.219:8000/chatbot/Bookshelf_AI", {
+  const res = await fetch("http://43.202.168.222/chatbot/Bookshelf_AI", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ user_id: userId, user_said: content }),
