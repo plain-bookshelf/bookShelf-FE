@@ -6,6 +6,6 @@ export const instance = axios.create({
   timeout: 3000,
   headers: { 
     'Content-Type': 'application/json',
-    Authorization: "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJraW0iLCJhdXRoIjoiUk9MRV9VU0VSIiwiYWZmaWxpYXRpb25JZCI6MSwiZXhwIjoxNzYyNzg1MjkyfQ.k0G1xNS9Ik73UqV3aTzAIZCp_LPoPzfH64hiS7V9JqD89AVqEpVKsMPt0Go_UJFMEUCI2fXeEz_Y6dTIW3xfJg"
+    Authorization: "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJtYW5hZ2VyIiwiYXV0aCI6IlJPTEVfTUFOQUdFUiIsImFmZmlsaWF0aW9uSWQiOjEsImV4cCI6MTc2Mjc4ODY1N30.cGVbT3Ls2qGAo-JwDkwdmfPBkJ8U7oQnpAz5rzSqAKyKpe_RStD00xvNRI50ec-brZQOcSw1mBe5vecrIevMhg"
   },
 })

@@ -5,16 +5,16 @@ import { useEffect, useState } from "react"
 import { Line, LineContainer } from "../components/book/style"
 import styled from "styled-components"
 import searchResult from "../assets/searchResult.png"
-import { getMain } from "../api/main"
+import { getBookSearch, getMain } from "../api/main"
 import { useUser } from "../components/contexts/UserContext"
 
 export default function Main() {
   const { user, setUser } = useUser();
   const [searchBookList, setSearchBookList] = useState<Book[]>([]);
-  const [popularBookList, setPopularBookList] = useState<Book[]>([{id: 1, book_name: "공중그네", book_type: "dddd>dddsa>한국소설", book_image_url: "https://image.aladin.co.kr/product/53/67/cover200/895660102x_2.jpg", author: "저자"}]);
+  const [popularBookList, setPopularBookList] = useState<Book[]>([]);
   const [newBookList, setNewBookList] = useState<Book[]>([]);
   const [search, setSearch] = useState<Boolean>(false);
-  const [query, setQuery] = useState<String>("");
+  const [query, setQuery] = useState<string>("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,13 +42,28 @@ export default function Main() {
     setQuery(content);
     setSearch(true);
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log("검색 결과 불러오는 중");
+        const { data } = await getBookSearch(query);
+        const resultList = data.data?.results || [];
+        setSearchBookList(resultList);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    
+    if (query) fetchData();
+  }, [query])
  
  return(<>
     <SearchBar handleSearch={handleSearch} State="book" />
 
     {searchBookList.length !== 0 && search &&
       <div>
-        <Title style={{margin: "0px auto 60px 240px"}}><span style={{color: "#00C471"}}>'{query}'</span> 에 대한 검색 결과입니다</Title>
+        <Title style={{margin: "0px auto 50px 240px"}}><span style={{color: "#00C471"}}>'{query}'</span> 에 대한 검색 결과입니다</Title>
         <B.BookList BookListTitle="검색 결과">
           {searchBookList.map((e) => (
           <B.Book
