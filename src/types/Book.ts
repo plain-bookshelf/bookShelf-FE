@@ -4,12 +4,16 @@ export type Book = {
   author: string;
   book_type: string;
   book_image_url: string;
+  rank?: number;
 }
 
 export type MyBook = {
-  title: string;
-  state: number | string;
-  id: number;
+  book_id: number;
+  book_name: string;
+  book_author: string;
+  is_over_due?: boolean;
+  over_due_time?: string;
+  day?: number;
 }
 
 export type RecommandBook = {

@@ -16,22 +16,21 @@ export default function Main() {
   const [search, setSearch] = useState<Boolean>(false);
   const [query, setQuery] = useState<String>("");
 
-useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       try{
-        console.log("요청 보냄");
+        console.log("책 가져오는 중");
         const res = await getMain();
         setPopularBookList(res.data.data.book_popularity_list_response_dto);
         setNewBookList(res.data.data.book_recent_list_response_dto);
-        setUser({...user, img: res.data.data.profile})
-
+        setUser({...user, img: res.data.data.profile, id: res.data.data.member_id});
       } catch(error) {
         console.error(error);
-      } 
+      }
     }
 
     fetchData();
-  }, [])
+  }, [user.id])
 
 
   const handleSearch = (content: string) => {
@@ -73,8 +72,9 @@ useEffect(() => {
 
     {!search &&
       <B.BookList BookListTitle="인기 도서">
-        {popularBookList.map((e) => (
+        {popularBookList.map((e, index) => (
           <B.Popular 
+            rank={index + 1}
             id={e.id}
             book_name={e.book_name}
             author={e.author}
