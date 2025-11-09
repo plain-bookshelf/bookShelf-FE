@@ -3,6 +3,7 @@ import type { Book } from "../../types/Book";
 import type { ReactNode } from "react";
 import { useRef, useState, useEffect } from "react";
 import scrollButton from "../../assets/scrollButton.png"
+import { BookNumber } from "../my/style";
 
 type Props = {
   searchTitle?: string
@@ -87,7 +88,7 @@ export function Book({book_name, book_type, book_image_url, author}: Book) {
   </>)
 }
 
-export function Popular({book_name, book_type, book_image_url, author}: Book) {
+export function Popular({book_name, book_type, book_image_url, author, rank}: Book) {
   const book_type_split = book_type.split(">");
   const category = book_type_split[book_type_split.length-1];
 
@@ -100,22 +101,9 @@ export function Popular({book_name, book_type, book_image_url, author}: Book) {
   return(<>
     <S.Book>
       <img style={{height: 300}} src={book_image_url}/>
-      {/* <S.RankBox>
-        <BookNumber style={{margin: 0}}>{nowRank}</BookNumber>
-        {preRank - nowRank > 0 && 
-        <S.ChangeRankBox>
-          <img src={rankUp}  style={{width: 20, height: 15}}/>
-          <S.ChangeRankText color="#FF0000">{preRank - nowRank}</S.ChangeRankText>
-        </S.ChangeRankBox>}
-        {preRank - nowRank < 0 && 
-        <S.ChangeRankBox>
-          <img src={rankDown}  style={{width: 20, height: 15}}/>
-          <S.ChangeRankText color="#314FB9">{Math.abs(preRank - nowRank)}</S.ChangeRankText>
-        </S.ChangeRankBox>}
-        {preRank - nowRank === 0 && 
-          <img src={rankUnchanged}  style={{width: 15, height: 2}}/>
-          }
-      </S.RankBox> */}
+      <S.RankBox>
+        <BookNumber style={{margin: 0}}>{rank}</BookNumber>
+      </S.RankBox>
       <S.BookInfo>
         <S.BookTitle>{title}</S.BookTitle>
         <S.Author>{author}</S.Author>

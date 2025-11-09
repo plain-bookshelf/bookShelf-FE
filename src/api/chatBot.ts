@@ -1,8 +1,8 @@
-export const postMessage = async (userId: string, content: string, onChunk?: (text: string) => void) => {
+export const postMessage = async (userName: string, content: string, onChunk?: (text: string) => void) => {
   const res = await fetch("http://43.202.168.222/chatbot/Bookshelf_AI", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user_id: userId, user_said: content }),
+    body: JSON.stringify({ user_id: userName, user_said: content }),
   });
 
   if (!res.body) return "서버 스트리밍이 지원되지 않습니다.";

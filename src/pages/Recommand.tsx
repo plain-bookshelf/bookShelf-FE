@@ -16,7 +16,7 @@ export default function RecommandList() {
     const fetchData = async () => {
       try{
         console.log("요청 보냄");
-        const res = await postRecommand(user.id);
+        const res = await postRecommand(user.name);
         setRecommandBooks(res.data);
         setloading(false);
       } catch(error) {

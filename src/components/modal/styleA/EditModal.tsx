@@ -6,6 +6,7 @@ import { BaseModal } from "../baseModal";
 import { lineWobble } from 'ldrs'
 import { useState } from "react";
 import Cropper from "react-easy-crop";
+import { patchEditUserImg } from "../../../api/my";
 
 export default function EditModal({ onClose }: { onClose: () => void }) {
   const { user, setUser } = useUser();
@@ -125,6 +126,7 @@ export default function EditModal({ onClose }: { onClose: () => void }) {
               const croppedUrl = await getCroppedImg(preview, croppedAreaPixels);
               setUser({ ...user, img: croppedUrl });
               onClose();
+              await patchEditUserImg(user.id, user.img);
             }} />
           </S.BoxA>
       </BaseModal>

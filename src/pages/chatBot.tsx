@@ -29,7 +29,7 @@ export default function ChatBot() {
     setsayChat(true);
 
     try {
-      const fullText = await postMessage(user.id, content);
+      const fullText = await postMessage(user.name, content);
 
       const chars = fullText.split("");
       await new Promise<void>((resolve) => {

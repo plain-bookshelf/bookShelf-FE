@@ -1,5 +1,5 @@
 import * as S from "./style"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import type { MyBook } from "../../types/Book";
 import userInfoedit from "../../assets/userInfoEdit.png"
 import userImgEdit from "../../assets/userImgEdit.png"
@@ -8,19 +8,71 @@ import EditModal from "../modal/styleA/EditModal";
 import lock from "../../assets/lock.png"
 import go from "../../assets/go.png"
 import { useNavigate } from "react-router-dom";
+import { getMyPage, getMyInfo, putEditUserName, patchEditUserImg } from "../../api/my";
 
 export default function MyProfile() {
   const { user, setUser } = useUser();
-  const [borrowBooks, setBorrowBooks] = useState<MyBook[]>([{title: "죽고 싶은 아이. 1", state: 3, id: 1},{title: "푸른사자와니니", state: 12, id: 2},{title: "디자인좀 그만 바뀌면", state: 100, id: 3},{title: "디자인좀 그만 바뀌면", state: 100, id: 4}]);
-  const [reserveBooks, setReserveBooks] = useState<MyBook[]>([{title: "동이는 장돌뱅...", state: "대여", id: 1,}]);
-  const [overdueBooks, setOverdueBooks] = useState<MyBook[]>([{title: "자몽살구클럽", state: 6, id: 1}, {title: "자몽살구클럽", state: 4, id: 2}]);
+  const [borrowBooks, setBorrowBooks] = useState<MyBook[]>([]);
+  const [reserveBooks, setReserveBooks] = useState<MyBook[]>([]);
+  const [overdueBooks, setOverdueBooks] = useState<MyBook[]>([]);
   const [penalty, setPenalty] = useState(0);
-  const [overdueStaes, setOverdueStaes] = useState(Math.max(...overdueBooks.map(e => Number(e.state))));
   const [statistics, setStatistics] = useState(0);
   const [edit, setEdit] = useState(false);
   const [editImgModal, setEditImgModal] = useState(false);
-  const [editName, setEditName] = useState(user.name);
+  const [editName, setEditName] = useState(user.nickName);
   const navigate = useNavigate();
+
+  const getDayDiff = (targetDate: string) => {
+    const now = new Date();
+    const dueDate = new Date(targetDate);
+
+    const diffTime = dueDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays;
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try{
+        console.log("정보 가져오는 중");
+        const res = await getMyPage(user.id);
+        setUser({...user, nickName: res.data.data.nick_name});
+        setStatistics(res.data.data.one_month_statistics);
+
+        const rentalBook = res.data.data.rental_book;
+
+        let borrowBook = rentalBook.filter((e: MyBook) => !e.is_over_due);
+        borrowBook = borrowBook.map((e: MyBook) => ({...e, day: getDayDiff(e.over_due_time!)}))
+        borrowBook = borrowBook.map((e: MyBook) => (e.book_name.length > 12 ? {...e, book_name: e.book_name.slice(0, 12) + "..."} : e))
+        setBorrowBooks(borrowBook);
+
+        setReserveBooks(res.data.data.reservation_book);
+
+        let overdueBook = rentalBook.filter((e: MyBook) => e.is_over_due);
+        overdueBook = overdueBook.map((e: MyBook) => ({...e, day: Math.abs(getDayDiff(e.over_due_time!))}))
+        setOverdueBooks(overdueBook);
+
+        setPenalty(res.data.data.user_over_due_date);
+      } catch(error) {
+        console.log(error)
+      }
+    }
+
+    fetchData();
+  }, [])
+
+  const userEditInfo = async () => {
+    setEdit(true);
+
+    try {
+      console.log("유저 정보 수정을 위한 정보 불러오는 중");
+      const res = await getMyInfo(user.id);
+      setUser({...user, email: res.data.data.address});
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   return(
     <>
@@ -34,9 +86,9 @@ export default function MyProfile() {
                 <img src={userImgEdit} style={{position: "absolute"}} />
               </S.ProfileOutlien>
               <div style={{display: "flex", alignItems: "center", flexWrap: "wrap"}}>
-                <S.InfoTitle color="#00C471">{user.name}</S.InfoTitle>
+                <S.InfoTitle color="#00C471">{user.nickName}</S.InfoTitle>
                 <S.InfoTitle color="black" style={{marginRight: "17px"}}>님의 회원정보</S.InfoTitle>
-                <img src={userInfoedit} onClick={() => setEdit(true)} style={{cursor: "pointer"}} />
+                <img src={userInfoedit} onClick={() => userEditInfo()} style={{cursor: "pointer"}} />
               </div>
             </S.ProfileBox>
             <S.InfoContainer>
@@ -52,7 +104,7 @@ export default function MyProfile() {
               <S.VerticalLine />
               <S.InfoBox>
                 <S.InfoTitle color="black">연체기간</S.InfoTitle>
-                <span><S.InfoContent color="#00C471">{overdueBooks.length !== 0 ? overdueStaes : penalty}</S.InfoContent><S.InfoContent color="black">일</S.InfoContent></span>
+                <span><S.InfoContent color="#00C471">{penalty}</S.InfoContent><S.InfoContent color="black">일</S.InfoContent></span>
               </S.InfoBox>
               <S.VerticalLine />
               <S.InfoBox>
@@ -66,13 +118,13 @@ export default function MyProfile() {
             <S.DetailInfoBox>
               <S.DetailInfoTitle>대출</S.DetailInfoTitle>
               <S.DetailInfoList>
-                {borrowBooks.map((e) => (
+                {borrowBooks.map((e, index) => (
                 <S.DetailInfo>
                   <S.BookInfoBox>
-                    <S.BookNumber>{e.id}</S.BookNumber>
+                    <S.BookNumber>{index + 1}</S.BookNumber>
                     <S.BookInfo>
-                      <S.BookTitle>{e.title}</S.BookTitle>
-                      <S.BookState>대여 {e.state}일 남음</S.BookState>
+                      <S.BookTitle>{e.book_name}</S.BookTitle>
+                      <S.BookState>대여 {e.day}일 남음</S.BookState>
                     </S.BookInfo>
                   </S.BookInfoBox>
                 </S.DetailInfo>
@@ -82,12 +134,12 @@ export default function MyProfile() {
             <S.DetailInfoBox>
               <S.DetailInfoTitle>예약</S.DetailInfoTitle>
               <S.DetailInfoList>
-                {reserveBooks.map((e) => (
+                {reserveBooks.map((e, index) => (
                 <S.DetailInfo>
                   <S.BookInfoBox>
-                    <S.BookNumber>{e.id}</S.BookNumber>
+                    <S.BookNumber>{index + 1}</S.BookNumber>
                     <S.BookInfo>
-                      <S.BookTitle>{e.title}</S.BookTitle>
+                      <S.BookTitle>{e.book_name}</S.BookTitle>
                       <S.BookState>예약</S.BookState>
                     </S.BookInfo>
                   </S.BookInfoBox>
@@ -98,13 +150,13 @@ export default function MyProfile() {
             <S.DetailInfoBox>
               <S.DetailInfoTitle>연체</S.DetailInfoTitle>
               <S.DetailInfoList>
-                {overdueBooks.map((e) =>  (
+                {overdueBooks.map((e, index) =>  (
                 <S.DetailInfo>
                   <S.BookInfoBox>
-                    <S.BookNumber>{e.id}</S.BookNumber>
+                    <S.BookNumber>{index + 1}</S.BookNumber>
                     <S.BookInfo>
-                      <S.BookTitle>{e.title}</S.BookTitle>
-                      <S.BookState>{e.state}일 연체중</S.BookState>
+                      <S.BookTitle>{e.book_name}</S.BookTitle>
+                      <S.BookState>{e.day}일 연체중</S.BookState>
                     </S.BookInfo>
                   </S.BookInfoBox>
                 </S.DetailInfo>
@@ -124,7 +176,7 @@ export default function MyProfile() {
                           alert("이름은 3 ~ 16자 사이어야 합니다")
                           return;
                         }
-                        setUser({ ...user, name: editName })
+                        setUser({ ...user, nickName: editName })
                         setEdit(false)
                       }
                     }}
@@ -184,7 +236,7 @@ export default function MyProfile() {
                 alert("이름은 3 ~ 16자 사이어야 합니다")
                 return;
               }
-              setUser({ ...user, name: editName })
+              setUser({ ...user, nickName: editName })
               setEdit(false)
               }}>확인</S.Button>
           </S.EditContainer>}
