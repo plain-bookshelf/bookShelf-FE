@@ -9,6 +9,7 @@ import lock from "../../assets/lock.png"
 import go from "../../assets/go.png"
 import { useNavigate } from "react-router-dom";
 import { getMyPage, getMyInfo, putEditUserName, patchEditUserImg } from "../../api/my";
+import { getDayDiff } from "../../utils/daydiff";
 
 export default function MyProfile() {
   const { user, setUser } = useUser();
@@ -22,15 +23,9 @@ export default function MyProfile() {
   const [editName, setEditName] = useState(user.nickName);
   const navigate = useNavigate();
 
-  const getDayDiff = (targetDate: string) => {
-    const now = new Date();
-    const dueDate = new Date(targetDate);
-
-    const diffTime = dueDate.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    return diffDays;
-  };
+  useEffect(() => {
+    setEditName(user.nickName);
+  }, [user.nickName])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,14 +38,15 @@ export default function MyProfile() {
         const rentalBook = res.data.data.rental_book;
 
         let borrowBook = rentalBook.filter((e: MyBook) => !e.is_over_due);
-        borrowBook = borrowBook.map((e: MyBook) => ({...e, day: getDayDiff(e.over_due_time!)}))
-        borrowBook = borrowBook.map((e: MyBook) => (e.book_name.length > 12 ? {...e, book_name: e.book_name.slice(0, 12) + "..."} : e))
+        borrowBook = borrowBook.map((e: MyBook) => ({...e, day: getDayDiff(e.over_due_time!)}));
+        borrowBook = borrowBook.map((e: MyBook) => (e.book_name.length > 8 ? {...e, book_name: e.book_name.slice(0, 8) + "..."} : e));
         setBorrowBooks(borrowBook);
 
         setReserveBooks(res.data.data.reservation_book);
 
         let overdueBook = rentalBook.filter((e: MyBook) => e.is_over_due);
         overdueBook = overdueBook.map((e: MyBook) => ({...e, day: Math.abs(getDayDiff(e.over_due_time!))}))
+        overdueBook = overdueBook.map((e: MyBook) => (e.book_name.length > 8 ? {...e, book_name: e.book_name.slice(0, 8) + "..."} : e));
         setOverdueBooks(overdueBook);
 
         setPenalty(res.data.data.user_over_due_date);
@@ -170,15 +166,14 @@ export default function MyProfile() {
                 <S.EditInputBox>
                   <S.EditInputTitle>닉네임</S.EditInputTitle>
                   <S.EditInput
-                    onKeyDown={(e) => {
-                      if(e.key == "Enter"){
-                        if(editName.length < 3 || editName.length > 16){
-                          alert("이름은 3 ~ 16자 사이어야 합니다")
-                          return;
-                        }
-                        setUser({ ...user, nickName: editName })
-                        setEdit(false)
+                    onKeyDown={async (e) => {
+                      if(editName.length < 3 || editName.length > 16){
+                        alert("이름은 3 ~ 16자 사이어야 합니다")
+                        return;
                       }
+                      setUser({ ...user, nickName: editName });
+                      setEdit(false);
+                      await putEditUserName(user.id, editName);
                     }}
                     allow={true}
                     weight={600}
@@ -231,13 +226,14 @@ export default function MyProfile() {
                   </S.EditBox>
                 </S.EditInputBox>
               </S.EditInputContainer>
-            <S.Button onClick={() => {
+            <S.Button onClick={async () => {
               if(editName.length < 3 || editName.length > 16){
                 alert("이름은 3 ~ 16자 사이어야 합니다")
                 return;
               }
-              setUser({ ...user, nickName: editName })
-              setEdit(false)
+              setUser({ ...user, nickName: editName });
+              setEdit(false);
+              await putEditUserName(user.id, editName);
               }}>확인</S.Button>
           </S.EditContainer>}
           {editImgModal && <EditModal onClose={() => setEditImgModal(false)}/>}

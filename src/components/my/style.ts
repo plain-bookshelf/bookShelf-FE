@@ -81,8 +81,7 @@ export const BookNumber = styled.span`
   border-radius: 5px;
   color: #00C471;
   text-align: center;
-  width: 30px;
-  height: 30px;
+  padding: 1px 10px;
   margin: 0 10px 0px 4px;
   border-radius: 5px;
 `

@@ -9,7 +9,7 @@ export const getMyInfo = async (userId: string) => {
 }
 
 export const putEditUserName = async (userId: string, userName: string) => {
-  return await instance.put(`/api/mypage/${userId}/retouch`, { nick_name: userName });
+  return await instance.patch(`/api/mypage/${userId}/retouch`, { nick_name: userName });
 }
 
 export const patchEditUserImg = async (userId: string, userImg: string) => {

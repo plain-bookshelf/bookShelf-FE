@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { useRef, useState, useEffect } from "react";
 import scrollButton from "../../assets/scrollButton.png"
 import { BookNumber } from "../my/style";
+import undefindImg from "../../assets/undefindImg.png"
 
 type Props = {
   searchTitle?: string
@@ -43,7 +44,7 @@ export const BookList: React.FC<Props> = ({searchTitle, BookListTitle, children}
   }
 
   return(<>
-    <S.Title><span style={{color: "#00C471"}}>{searchTitle}</span>{BookListTitle}</S.Title>
+    {BookListTitle !== "검색 결과" && <S.Title><span style={{color: "#00C471"}}>{searchTitle}</span>{BookListTitle}</S.Title>}
     <S.Container>
       {showLeft &&
         <S.ScrollButton onClick={scrollLeft}>
@@ -73,6 +74,10 @@ export function Book({book_name, book_type, book_image_url, author}: Book) {
     title = book_name.slice(0, 8) + "...";
   }
 
+  if(book_image_url === null){
+    book_image_url = undefindImg;
+  }
+
   return(<>
     <S.Book>
       <img style={{height: 300}} src={book_image_url}/>
@@ -99,6 +104,10 @@ export function Popular({book_name, book_type, book_image_url, author, rank}: Bo
   
   if(book_name.length > 8){
     title = book_name.slice(0, 8) + "...";
+  }
+
+  if(book_image_url === null){
+    book_image_url = undefindImg;
   }
 
   return(<>
