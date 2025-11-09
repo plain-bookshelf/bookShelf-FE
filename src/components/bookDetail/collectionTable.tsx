@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import * as S from './style';
 import type { CollectionItem } from '../../types/bookTypes';
 
 interface CollectionTableProps {
   items: CollectionItem[];
-  // 실제 서비스에서는 대출/예약 API 호출 함수가 전달됨
-  onAction: (action: 'loan' | 'reserve', itemId: string) => void;
+  onAction: (action: 'loan' | 'reserve', itemId: string) => Promise<void> | void;
 }
 
 const CollectionTable: React.FC<CollectionTableProps> = ({ items, onAction }) => {
+  const [loadingId, setLoadingId] = useState<string | null>(null);
+
+  const handleClick = async (action: 'loan' | 'reserve', id: string) => {
+    if (loadingId) return;
+    setLoadingId(id);
+    try {
+      await onAction(action, id);
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
   return (
     <S.CollectionContainer>
       <S.LibraryTable>
@@ -25,9 +36,14 @@ const CollectionTable: React.FC<CollectionTableProps> = ({ items, onAction }) =>
         <S.TableBody>
           {items.map((item) => {
             const isLoaned = item.status === '대출중';
-            const loanButtonType = isLoaned ? 'disabled' : 'primary';
-            const reserveButtonType = isLoaned ? 'secondary' : 'disabled';
-            
+            const isLoanable = item.status === '대출가능';
+            const isLoading = loadingId === item.id;
+
+            const loanType: 'primary' | 'secondary' | 'disabled' =
+              isLoanable && !isLoading ? 'primary' : 'disabled';
+            const reserveType: 'primary' | 'secondary' | 'disabled' =
+              isLoaned && !isLoading ? 'secondary' : 'disabled';
+
             return (
               <tr key={item.id}>
                 <td>{item.library}</td>
@@ -37,18 +53,26 @@ const CollectionTable: React.FC<CollectionTableProps> = ({ items, onAction }) =>
                 </S.StatusCell>
                 <td>{isLoaned ? item.dueDate : item.callNumber}</td>
                 <td>
-                  <S.ActionButton 
-                    $type={loanButtonType}
-                    disabled={isLoaned}
-                    onClick={() => !isLoaned && onAction('loan', item.id)}>
-                    대출하기
+                  <S.ActionButton
+                    $type={loanType}
+                    disabled={!isLoanable || isLoading}
+                    onClick={() =>
+                      isLoanable && !isLoading && handleClick('loan', item.id)
+                    }
+                  >
+                    {isLoading && loadingId === item.id
+                      ? '대출 중...'
+                      : '대출하기'}
                   </S.ActionButton>
                 </td>
                 <td>
-                  <S.ActionButton 
-                    $type={reserveButtonType}
-                    disabled={!isLoaned}
-                    onClick={() => isLoaned && onAction('reserve', item.id)}>
+                  <S.ActionButton
+                    $type={reserveType}
+                    disabled={!isLoaned || isLoading}
+                    onClick={() =>
+                      isLoaned && !isLoading && handleClick('reserve', item.id)
+                    }
+                  >
                     대출예약
                   </S.ActionButton>
                 </td>

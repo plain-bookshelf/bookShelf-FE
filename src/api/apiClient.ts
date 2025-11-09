@@ -8,6 +8,15 @@ import type{ LoginTokenData, TokenReissueRequest } from '../types/authTypes';
 let isTokenRefreshing = false;
 let failedQueue: { resolve: (value: unknown) => void; reject: (reason?: unknown) => void; config: AxiosRequestConfig }[] = [];
 
+const isAuthUrl = (url?: string) => {
+  if (!url) return false;
+  return (
+    url.includes('/api/auth/login') ||
+    url.includes('/api/auth/signup') ||
+    url.includes('/api/auth/reissue')
+  );
+};
+
 // 실패한 요청들을 재시도하거나 실패 처리하는 함수
 const processQueue = (error: AxiosError | null, token: string | null = null) => {
     failedQueue.forEach(prom => {
@@ -29,7 +38,7 @@ const processQueue = (error: AxiosError | null, token: string | null = null) => 
 
 // 기본 Axios 인스턴스 생성
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: "http://13.125.65.240:8080",
+  baseURL: "http://13.124.75.92:8080",
   headers: {
     'Content-Type': 'application/json',
   },
@@ -40,14 +49,13 @@ axiosInstance.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
     // 토큰 갱신 API(reissue)를 호출할 때는 Access Token을 헤더에 넣지 않도록 제외
-    if (token && config.url !== '/api/auth/reissue' && config.url?.endsWith('/login') === false) { 
+     if (token && !isAuthUrl(config.url)) {
+      config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 
@@ -56,64 +64,61 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+    const url = originalRequest?.url || '';
     const refreshToken = getRefreshToken();
 
-    // 1. Access Token 만료 에러 (401) 처리
+    // ✅ auth 관련 요청이면: 토큰 재발급/강제 이동 하지 말고 그대로 에러만 던짐
+    if (isAuthUrl(url)) {
+      return Promise.reject(error);
+    }
+
+
+    // ✅ 그 외 API에서만 401 → 토큰 재발급 로직 수행
     if (error.response?.status === 401 && !originalRequest._retry) {
-      
       originalRequest._retry = true;
 
-      // 1-1. Refresh Token이 없으면 즉시 재로그인으로 이동
       if (!refreshToken) {
         removeTokens();
-        window.location.href = '/logIn'; 
+        window.location.href = '/login';
         return Promise.reject(error);
       }
 
-      // 1-2. 이미 갱신 시도가 진행 중인 경우, 요청을 큐에 저장
       if (isTokenRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject, config: originalRequest });
         });
       }
 
-      // 1-3. 토큰 갱신 시작
       isTokenRefreshing = true;
 
       try {
         const accessToken = getAccessToken();
-        
         const reissueData: TokenReissueRequest = {
-            access_token: accessToken || "", 
-            refresh_token: refreshToken
+          access_token: accessToken || '',
+          refresh_token: refreshToken,
         };
 
         const response = await postTokenReissue(reissueData);
         const newTokens: LoginTokenData = response.data;
 
-        // 2. 갱신 성공: 새 토큰 저장 및 대기열 요청 재시도
         setTokens(newTokens);
         processQueue(null, newTokens.access_token);
-        
-        // 3. 원래 실패했던 요청 재시도
+
         originalRequest.headers = originalRequest.headers || {};
         originalRequest.headers['Authorization'] = `Bearer ${newTokens.access_token}`;
-        return axiosInstance(originalRequest);
-        
-      } catch (refreshError) {
-        // 4. 갱신 실패 (Refresh Token 만료): 재로그인 처리
-        console.error("Refresh Token is expired or invalid. Re-login required.", refreshError);
-        removeTokens();
-        processQueue(error); // 대기열 요청 모두 실패 처리
-        window.location.href = '/login'; 
-        return Promise.reject(error);
 
+        return axiosInstance(originalRequest);
+      } catch (refreshError) {
+        console.error('Refresh Token is expired or invalid. Re-login required.', refreshError);
+        removeTokens();
+        processQueue(error);
+        window.location.href = '/login';
+        return Promise.reject(error);
       } finally {
         isTokenRefreshing = false;
       }
     }
-    
-    // 401 에러가 아니거나 이미 재시도한 요청은 그대로 에러 반환
+
     return Promise.reject(error);
   }
 );

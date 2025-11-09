@@ -65,6 +65,7 @@ export const CommentBottomContent = styled.div`
   height: 22px;
   display: flex;
   align-items: center;
+  margin-top: 5px;
 `
 
 export const LikeContent = styled.div`

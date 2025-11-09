@@ -2,7 +2,7 @@ import axios from "axios";
 import axiosInstance from './apiClient';
 import type {signupRequest, signupResponse, apiResponse} from "../types/signupTypes"
 
-const SIGNUP_ENDPOINT = "/auth/signup";
+// const SIGNUP_ENDPOINT = "/api/auth/signup";
 
 /**
  * 회원가입 API 호출 함수
@@ -11,19 +11,20 @@ const SIGNUP_ENDPOINT = "/auth/signup";
  */
 
 export async function signup(data: signupRequest): Promise<signupResponse> {
-    const url = `${SIGNUP_ENDPOINT}`;
+    const url = `/api/auth/signup`;
 
     const requestBody = { ...data };
     if (!requestBody.address || requestBody.address.trim() === "") {
         delete requestBody.address;
     }
+    console.log(requestBody);
 
     try {
         // axios.post에 응답 타입(ApiResponse<SignupResponseData>)을 제네릭으로 전달
         const response = await axiosInstance.post<apiResponse<signupResponse>>(url, requestBody);
 
         // 응답 데이터의 data 필드를 반환 (SignupResponseData 타입)
-        return response.data.data; 
+        return response.data.data;
 
     } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

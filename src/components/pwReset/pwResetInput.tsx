@@ -93,7 +93,7 @@ export function PwResetInput({
               <S.ErrorMessageContent>
                 <img src={danger}/>
                 <S.ErrorMessage>{confirmPasswordError}</S.ErrorMessage>
-              </S.ErrorMessageContent>}
+              </S.ErrorMessageContent>} 
             <S.NextButton onClick={handleSubmit} disabled={isLoading}>확인</S.NextButton>
           </S.InputContent>
         </S.Content>

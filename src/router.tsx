@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./layouts/Layout";
 import My from "./pages/Mypage";
 import Main from "./pages/Main";
-import Login from "./pages/logIn";
+import Login from "./pages/login";
 import EmailRegistration from "./pages/emailRegistration";
 import Signup from "./pages/SignUp"
 import IdPasswordFind from "./pages/idPasswordFind";
@@ -22,7 +22,7 @@ export default function Router() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route path="/" element={<Layout />}> 
           <Route index element={<Main />} />
           <Route path="/My" element={<My />} />
           <Route path="/Login" element={<Login/>}/>
@@ -33,7 +33,8 @@ export default function Router() {
           <Route path="/showId" element={<ShowId/>}/>
           <Route path="/pwReset" element={<PwReset/>}/>
           <Route path="/checkEmailPwReset" element={<CheckEmailPwReset/>}/>
-          <Route path="/bookdetail" element={<BookDetail/>}/>
+          <Route path="/book/:bookId" element={<BookDetail/>}/>
+          {/* <Route path="/bookDetail" element={<BookDetail/>}/> */}
           <Route path="/showPw" element={<ShowPw/>}/>
           <Route path="/MyPwReset" element={<MyPwReset/>}/>
           <Route path="/recommand" element={<RecommandList />} />

@@ -1,8 +1,9 @@
 export interface signupRequest{
-  user_name: string;
-  nick_name: string;
+  username: string;
+  nickname?: string;
   password: string;
   address?: string;
+  affiliation_name: string;
 }
 
 export interface signupResponse{
