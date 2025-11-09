@@ -2,10 +2,11 @@ import styled from "styled-components"
 
 export const Container = styled.div`
     height: 96px;
-    width: 100%;
+    width: 1920px;
     max-width: 1920px;
     border-bottom: 2px solid #00C471;
     display: flex;
+    align-items: center;
 `
 
 export const Logo = styled.img`
@@ -82,8 +83,8 @@ export const TextContent = styled.div`
   margin-bottom: 25px;
   
   display: flex;
-  justify-content: space-around; /* Fixed typo from "jestify-content" */
-  align-items: center; /* Added to vertically center content */
+  justify-content: space-around;
+  align-items: center;
 `
 
 export const LogInContent = styled.div`
@@ -121,3 +122,20 @@ export const SignUpText = styled.a`
   color: #00C471;
   text-decoration: none;
 `
+
+export const ProfileWrapper = styled.div`
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 240px;
+  gap: 8px;
+  cursor: pointer;
+`;
+
+export const ProfileAvatar = styled.img`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+`;

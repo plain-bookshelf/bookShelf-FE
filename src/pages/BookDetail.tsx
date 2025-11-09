@@ -1,74 +1,160 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+
+import { useParams, useNavigate } from 'react-router-dom';
 import BookInfoSection from '../components/bookDetail/bookInfoSection';
 import CollectionTable from '../components/bookDetail/collectionTable';
 import * as S from '../components/bookDetail/style';
 import type { BookDetailData } from '../types/bookTypes';
-import ReviewSection from '../components/comment/ReviewSection'
-
-
-// Mock Data (이미지 디자인 기반)
-const mockBookData: BookDetailData = {
-  title: '회색 인간',
-  coverImage: '회색_인간_표지_경로.png', // 실제 이미지 경로로 대체 필요
-  author: '김동식 지음',
-  publisher: '요다',
-  pubYear: 2017,
-  registrationId: 'EM0020789',
-  releaseDate: '2025/04/15',
-  summary: `‘오늘의 유머’ 공포게시판에서 많은 이들의 호응을 얻었던  ‘김동식의 소설집’. 작가는 10년 동안 공장에서 노동하면서 머릿속으로 수없이 떠올렸던 이야기들을 거의 매일 게시판에올렸다. ‘김동식 소설집’은 그렇게 써내려간 300편의 짧은 소설 가운데 66편을 추려 묶은 것이다.`,
-  categories: ['한국소설'],
-  collection: [
-    { id: 'EM00018181', library: '대덕소프트웨어마이스터고등학교', status: '대출중', dueDate: '2025-08-09', callNumber: '813.7 ㄱ25 ㅎ c.3' },
-    { id: 'EM00018182', library: '대덕소프트웨어마이스터고등학교', status: '대출가능', dueDate: "2025-08-09", callNumber: '813.7 ㄱ25 ㅎ c.3' },
-    { id: 'EM00018183', library: '대덕소프트웨어마이스터고등학교', status: '대출중', dueDate: '2025-08-09', callNumber: '813.7 ㄱ25 ㅎ c.4' },
-    { id: 'EM00018184', library: '대덕소프트웨어마이스터고등학교', status: '대출중', dueDate: '2025-08-09', callNumber: '813.7 ㄱ25 ㅎ c.5' },
-  ],
-};
+import ReviewSection from '../components/comment/ReviewSection';
+import { getBookDetail } from '../api/bookDetail';
+import { requestBookRentalSafe, requestBookReservation } from '../api/bookApi'; // 대출 API 기존 것 재사용
 
 export default function BookDetail() {
-  const [activeTab, setActiveTab] = useState<'collection' | 'review'>('collection');
+  const { bookId } = useParams<{ bookId: string }>();
+  const navigate = useNavigate();
 
-  // 대출/예약 버튼 클릭 핸들러 (실제 로직은 API 호출이 필요)
-  const handleAction = (action: 'loan' | 'reserve', itemId: string) => {
-    alert(`[${action === 'loan' ? '대출' : '예약'}] 요청: 등록번호 ${itemId}`);
-    // 실제 구현: 여기서 서버에 요청을 보내고 상태를 업데이트합니다.
+  const [book, setBook] = useState<BookDetailData | null>(null);
+  const [activeTab, setActiveTab] =
+    useState<'collection' | 'review'>('collection');
+  const [isLoading, setIsLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // 📌 상세 정보 로딩
+  useEffect(() => {
+    const load = async () => {
+      if (!bookId) {
+        setError('잘못된 접근입니다.');
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const data = await getBookDetail(bookId);
+        setBook(data);
+      } catch (e: any) {
+        if (e.message === 'NO_TOKEN' || e.message === 'UNAUTHORIZED') {
+          alert('로그인 후 이용 가능한 서비스입니다.');
+          navigate('/login');
+          return;
+        }
+        if (e.message === 'NOT_FOUND') {
+          setError('존재하지 않는 도서입니다.');
+        } else {
+          setError('도서 정보를 불러오는 중 오류가 발생했습니다.');
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    load();
+  }, [bookId, navigate]);
+
+  // 📌 대출 / 예약 액션
+  const handleAction = async (
+    action: 'loan' | 'reserve',
+    itemId: string,
+  ): Promise<void> => {
+    if (!book || actionLoading) return;
+
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      alert('로그인 후 이용 가능한 서비스입니다.');
+      navigate('/login');
+      return;
+    }
+
+    if (action === 'loan') {
+      try {
+        setActionLoading(true);
+
+        // /api/book/{book_id} PATCH 대출 요청
+        const res = await requestBookRentalSafe(book.bookId);
+
+        // UI 상태 반영: 해당 등록번호(status → 대출중)
+        setBook((prev) =>
+          !prev
+            ? prev
+            : {
+                ...prev,
+                collection: prev.collection.map((item) =>
+                  item.id === itemId
+                    ? { ...item, status: '대출중' }
+                    : item,
+                ),
+              },
+        );
+
+        alert(res.message || '성공적으로 대출되었습니다.');
+      } catch (e: any) {
+        alert(e.message || '도서 대여 요청 중 오류가 발생했습니다.');
+      } finally {
+        setActionLoading(false);
+      }
+    }
+
+    if (action === 'reserve') {
+      try {
+    setActionLoading(true);
+
+    const res = await requestBookReservation(itemId);
+
+    // UI 상태 업데이트: 예약 성공 시 상태를 "예약중" 등으로 변경하고 싶다면 여기서 처리
+  setBook((prev) =>
+    prev
+      ? {
+          ...prev,
+          collection: prev.collection.map((item) =>
+            item.id === itemId
+              ? { ...item, status: '예약중' } // 서버에서 쓰는 예약 상태 값에 맞추기
+              : item,
+          ),
+        }
+      : prev,
+  );
+
+    alert(res.message || '도서 예약이 완료되었습니다.');
+  } catch (e: any) {
+    alert(e.message || '도서 예약 요청 중 오류가 발생했습니다.');
+  } finally {
+    setActionLoading(false);
+  }
+    }
   };
 
+  if (isLoading) return <div>도서 정보를 불러오는 중입니다...</div>;
+  if (error || !book) return <div>{error ?? '도서 정보를 찾을 수 없습니다.'}</div>;
+
   return (
-    <>
-      <S.DetailPageWrapper>
-        <BookInfoSection book={mockBookData} />
-          
-        <S.Divider />
+    <S.DetailPageWrapper>
+      <BookInfoSection book={book} />
+      <S.Divider />
 
-        {/* 탭 네비게이션 */}
-        <S.TabContainer>
-          <S.DetailTabs>
-            <S.TabButton 
-              $isActive={activeTab === 'collection'}
-              onClick={() => setActiveTab('collection')}>
-              소장정보
-            </S.TabButton>
-            <S.TabButton 
-              $isActive={activeTab === 'review'}
-              onClick={() => setActiveTab('review')}>
-              리뷰
-            </S.TabButton>
-          </S.DetailTabs>
-        </S.TabContainer>
+      <S.TabContainer>
+        <S.DetailTabs>
+          <S.TabButton
+            $isActive={activeTab === 'collection'}
+            onClick={() => setActiveTab('collection')}
+          >
+            소장정보
+          </S.TabButton>
+          <S.TabButton
+            $isActive={activeTab === 'review'}
+            onClick={() => setActiveTab('review')}
+          >
+            리뷰
+          </S.TabButton>
+        </S.DetailTabs>
+      </S.TabContainer>
 
-        {/* 탭 콘텐츠 */}
-        {activeTab === 'collection' && (
-          <CollectionTable 
-            items={mockBookData.collection} 
-            onAction={handleAction} 
-          />
-        )}
-          
-        {activeTab === 'review' && (
-          <ReviewSection/>
-        )}
-      </S.DetailPageWrapper>
-    </>
-  )
+      {activeTab === 'collection' && (
+        <CollectionTable items={book.collection} onAction={handleAction} />
+      )}
+
+      {activeTab === 'review' && (
+      <ReviewSection bookId={book.bookId} />)}
+    </S.DetailPageWrapper>
+  );
 }
+

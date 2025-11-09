@@ -3,6 +3,8 @@ import SingupInput from "../components/signup/SignupInput"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Signup from "../api/signup"
+import type { signupRequest } from "../types/signupTypes"
+import { useLocation } from "react-router-dom"
 
 // 허용되는 문자
 const ASCII_REGEX = /[^\x20-\x7F]/
@@ -22,6 +24,13 @@ export default function Singup() {
   const [isLoading, setIsLoading] = useState(false)
 
   const navigate = useNavigate()
+
+  const location = useLocation();
+  const {emailAddress} =
+  (location.state as { emailAddress?: string}) || {
+    emailAddress: "",
+    isEmailVerified: false,
+  };
   
   /**
    * 입력값의 유효성을 검사하고, 오류 메시지만 설정합니다.
@@ -137,16 +146,17 @@ export default function Singup() {
 
     setIsLoading(true)
 
-    const requsetData = {
-      user_name: username,
-      nick_name: username,
+    const requestData: signupRequest = {
+      username: username,
+      nickname: username,
       password: password,
-      address: "",
+      address: emailAddress || "", 
+      affiliation_name: "대덕소프트웨어마이스터고등학교",
     }
 
     try {
       // (서버 통신 시뮬레이션)
-      const userData = await Signup(requsetData)
+      const userData = await Signup(requestData)
       
       console.log("회원가입 데이터:", {userData})
       alert("회원가입이 완료되었습니다!")

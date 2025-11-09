@@ -8,7 +8,7 @@ import type{
 import axiosInstance from "./apiClient";
 
 // API 기본 URL (실제 백엔드 서버 URL로 변경해야 합니다)
-const BASE_URL = ""; 
+const BASE_URL = "http://13.124.75.92:8080"; 
 
 /**
  * 이메일 인증번호 전송 API 호출 (POST /email/send)
@@ -16,7 +16,7 @@ const BASE_URL = "";
  * @returns Promise<ApiResponse>
  */
 export async function sendEmailVerification(address: string): Promise<ApiResponse> {
-    const endpoint = `${BASE_URL}/email/send`;
+    const endpoint = `${BASE_URL}/api/email/send`;
     
     const requestBody: EmailSendRequest = {
         address: address,
@@ -35,7 +35,7 @@ export async function sendEmailVerification(address: string): Promise<ApiRespons
             }
         );
 
-        if (response.status === 201 && response.data.status === "success") {
+        if (response.status === 201 && response.data.status === "CREATED") {
             console.log("이메일 인증 요청 성공:", response.data.message);
             return response.data;
         } else {
@@ -61,7 +61,7 @@ export async function sendEmailVerification(address: string): Promise<ApiRespons
  * @returns Promise<EmailVerifyResponse>
  */
 export async function verifyEmailCode(address: string, verificationCode: string): Promise<EmailVerifyResponse> {
-    const endpoint = `${BASE_URL}/email/verify`;
+    const endpoint = `${BASE_URL}/api/email/verify`;
 
     const requestBody: EmailVerifyRequest = {
         address: address,
@@ -81,7 +81,7 @@ export async function verifyEmailCode(address: string, verificationCode: string)
         );
 
         // Success Response: status 201 OK
-        if (response.status === 201 && response.data.status === "success") {
+        if (response.status === 201 && response.data.status === "CREATED") {
             console.log("이메일 인증 확인 성공:", response.data.message);
             return response.data;
         } else {

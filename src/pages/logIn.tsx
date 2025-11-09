@@ -17,6 +17,7 @@ export default function LogIn() {
     // 1. 이전 메시지 초기화 
     setError("")
     setLoginError(false)
+    
 
     // 2. 입력값 유효성 검사
     if (!identifier.trim()) {
@@ -48,7 +49,7 @@ export default function LogIn() {
       };
 
       const response = await postLogin(loginRequestData);
-      
+
       const tokenData = response.data;
 
       localStorage.setItem("access_token", tokenData.access_token);
