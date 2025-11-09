@@ -1,0 +1,21 @@
+.pagination {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  padding: 0;
+  margin-top: 60px;
+  gap: 32px;
+}
+
+.page-link {
+  cursor: pointer;
+  color: rgba(0, 196, 113, 0.28);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.page-item.active .page-link {
+  color: #00C471;
+  border: none;
+}
