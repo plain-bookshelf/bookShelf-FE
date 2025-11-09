@@ -90,7 +90,10 @@ export function Book({book_name, book_type, book_image_url, author}: Book) {
 
 export function Popular({book_name, book_type, book_image_url, author, rank}: Book) {
   const book_type_split = book_type.split(">");
-  const category = book_type_split[book_type_split.length-1];
+  let category = book_type_split[book_type_split.length-1];
+  if(category.length> 8){
+    category = category.slice(0, 8) + "...";
+  }
 
   let title = book_name;
   

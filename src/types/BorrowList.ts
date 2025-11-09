@@ -1,9 +1,10 @@
 export type  BorrowList = {
-  title: string;
-  registerNumber: string;
-  userName: string;
-  rentalDate: string;
-  overdue: boolean;
+  book_name: string;
+  registration_number: string;
+  nick_name: string;
+  return_date: string;
+  overdue_status: boolean;
+  day?: number;
   allow: boolean;
 }
 
