@@ -5,12 +5,12 @@ export const ManagementContext = createContext<ManagementContextType>({manageDat
 
 /*{ children } 구조분해 할당 받고 { children: ReactNode } 구조분해 할당 받은 children이 ReactNode라고 명시 {} 로 둘다 감싼 건 둘다 객체임을 명시*/
 export const Provider = ({ children }: { children: ReactNode }) => { 
-  const [manageData, setManageData] = useState<BorrowAllow[]>([{title: "집", registerNumber: "EM00018181", userName: "ZXO", requestDate: "2025-08-09", allow: true}, {title: "집", registerNumber: "EM00018182", userName: "ZXO", requestDate: "2025-08-09", allow: false}, {title: "집", registerNumber: "EM00018183", userName: "ZXO", requestDate: "2025-08-09", allow: false},{title: "집", registerNumber: "EM00018184", userName: "ZXO", requestDate: "2025-08-09", allow: false}]);
+  const [manageData, setManageData] = useState<BorrowAllow[]>([]);
   
   const allowData = (data: BorrowAllow) => {
     setManageData(prev =>
       prev.map(item =>
-        item.registerNumber === data.registerNumber
+        item.registration_number === data.registration_number
           ? { ...item, allow: true }
           : item
       )

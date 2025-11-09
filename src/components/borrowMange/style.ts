@@ -26,6 +26,7 @@ export const BorrowInfpContainer = styled.div`
   display: flex;
   gap: 40px;
   border-bottom: 1px solid #DCDCDC;
+  align-items: center;
 `
 
 export const Info = styled(Category)<Text>`

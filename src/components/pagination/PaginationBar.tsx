@@ -11,7 +11,9 @@ export default function PaginationBar({ pageCount, onPageChange }: any) {
         pageCount={pageCount}
         marginPagesDisplayed={2}
         pageRangeDisplayed={5}
-        onPageChange={e => onPageChange(e.selected)}
+        onPageChange={e => {
+          console.log("AllowList에서 받은 이벤트:", e);
+          onPageChange(e)}}
         containerClassName={"pagination"}
         pageClassName={"page-item"}
         pageLinkClassName={"page-link"}

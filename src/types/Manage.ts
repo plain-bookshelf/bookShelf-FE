@@ -1,9 +1,9 @@
 export type  BorrowAllow = {
-  title: string;
-  registerNumber: string;
-  userName: string;
-  requestDate: string;
-  allow: boolean;
+  book_name: string;
+  registration_number: string;
+  nick_name: string;
+  request_date: string;
+  allow?: boolean;
 }
 
 export type ManagementContextType = {
