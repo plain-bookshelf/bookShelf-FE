@@ -9,9 +9,13 @@ export const getMyInfo = async (userId: string) => {
 }
 
 export const putEditUserName = async (userId: string, userName: string) => {
-  return await instance.put(`/api/mypage/${userId}/retouch`, { nick_name: userName });
+  return await instance.patch(`/api/mypage/${userId}/retouch`, { nick_name: userName });
 }
 
 export const patchEditUserImg = async (userId: string, userImg: string) => {
   return await instance.patch(`/api/mypage/${userId}/profile-upload`, { member_profile: userImg });
 }
+
+export const deleteUser = async () => {
+  return await instance.delete(`/api/auth/delete`);
+} 
