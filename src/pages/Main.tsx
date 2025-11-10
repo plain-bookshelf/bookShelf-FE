@@ -15,6 +15,7 @@ export default function Main() {
   const [newBookList, setNewBookList] = useState<Book[]>([]);
   const [search, setSearch] = useState<Boolean>(false);
   const [query, setQuery] = useState<string>("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,9 +48,11 @@ export default function Main() {
     const fetchData = async () => {
       try {
         console.log("검색 결과 불러오는 중");
+        setLoading(true);
         const { data } = await getBookSearch(query);
         const resultList = data.data?.results || [];
         setSearchBookList(resultList);
+        setLoading(false);
       } catch (error) {
         console.error(error);
       }
@@ -78,7 +81,7 @@ export default function Main() {
       </div>
     }
 
-    {searchBookList.length === 0 && search &&
+    {searchBookList.length === 0 && search && !loading &&
       <Container>
         <img src={searchResult} style={{margin: "155px 0 54px"}} />
         <Title style={{margin: "0 0 100px 0", color: "#878787"}}><span style={{color: "#00C471", fontSize: "40px"}}>'{query}'</span>에 대한 검색 결과가 없습니다</Title>

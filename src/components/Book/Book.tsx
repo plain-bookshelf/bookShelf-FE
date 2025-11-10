@@ -66,7 +66,10 @@ export const BookList: React.FC<Props> = ({searchTitle, BookListTitle, children}
 
 export function Book({book_name, book_type, book_image_url, author}: Book) {
   const book_type_split = book_type.split(">");
-  const category = book_type_split[book_type_split.length-1];
+  let category = book_type_split[book_type_split.length-1];
+  if(category.length> 8){
+    category = category.slice(0, 8) + "...";
+  }
 
   let title = book_name;
   
@@ -110,6 +113,12 @@ export function Popular({book_name, book_type, book_image_url, author, rank}: Bo
     book_image_url = undefindImg;
   }
 
+  let book_author = author;
+
+  if(author.length > 8){
+    book_author = author.slice(0, 8) + "...";
+  }
+
   return(<>
     <S.Book>
       <img style={{height: 300}} src={book_image_url}/>
@@ -118,7 +127,7 @@ export function Popular({book_name, book_type, book_image_url, author, rank}: Bo
       </S.RankBox>
       <S.BookInfo>
         <S.BookTitle>{title}</S.BookTitle>
-        <S.Author>{author}</S.Author>
+        <S.Author>{book_author}</S.Author>
         <S.CategoryBox>
           <S.CategoryFilter>카테고리 분류</S.CategoryFilter>
           <S.Category>{category}</S.Category>
