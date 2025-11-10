@@ -61,8 +61,7 @@ export function EmailInput() {
 
   // 1. 이메일을 아예 안쓴 경우
   if (!trimmedEmail) {
-    setEmailError(true)
-    setNextError("이메일을 입력해 주세요.")
+    navigate("/signup")
     return
   }
 

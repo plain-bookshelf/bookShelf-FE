@@ -126,7 +126,7 @@ export default function PwReset() {
     setIsLoading(true);
 
     try {
-      // ✅ 실제 서버 호출
+      //  실제 서버 호출
       await resetPasswordByFind(username, newPassword);
 
       alert("비밀번호 재설정이 완료되었습니다!");

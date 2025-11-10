@@ -75,7 +75,7 @@ export const getBookDetail = async (
       `/book/${bookId}`,
       {
         headers: {
-          Authorization: `Bearer ${token}`,        // 🔐 Bearer 토큰 필수
+          Authorization: `Bearer ${token}`,  
           'Content-Type': 'application/json',
         },
       },
