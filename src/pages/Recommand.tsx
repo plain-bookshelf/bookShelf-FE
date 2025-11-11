@@ -5,6 +5,7 @@ import styled from "styled-components";
 import { postRecommand } from "../api/recommand";
 import { useUser } from "../components/contexts/UserContext";
 import { bouncy } from 'ldrs'
+import Loading from "../components/loading/loading";
 bouncy.register();
 
 export default function RecommandList() {
@@ -43,13 +44,7 @@ export default function RecommandList() {
           ></Recoomand>
         ))}
       </Container>
-      {loading && <LoadingContainer >
-        <l-bouncy
-          size="70"
-          speed="2.0" 
-          color="#00C471" 
-        ></l-bouncy>
-      </LoadingContainer>}
+      <Loading loading={loading} bookList={recommandBooks} />
     </>
   )
 }
@@ -60,12 +55,4 @@ const Container = styled.div`
   align-items: center;
   margin-top: 75px;
   gap: 35px;
-`
-
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 400px;
 `

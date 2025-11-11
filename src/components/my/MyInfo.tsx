@@ -8,7 +8,7 @@ import EditModal from "../modal/styleA/EditModal";
 import lock from "../../assets/lock.png"
 import go from "../../assets/go.png"
 import { useNavigate } from "react-router-dom";
-import { getMyPage, getMyInfo, putEditUserName, patchEditUserImg } from "../../api/my";
+import { getMyPage, getMyInfo, putEditUserName, postLogout } from "../../api/my";
 import { getDayDiff } from "../../utils/daydiff";
 import deleteUser from "../../assets/deleteUser.png";
 import DeleteUserModal from "../modal/styleB/DeleteUserModal";
@@ -35,7 +35,7 @@ export default function MyProfile() {
       try{
         console.log("정보 가져오는 중");
         const res = await getMyPage(user.id);
-        setUser({...user, nickName: res.data.data.nick_name});
+        setUser({...user, nickName: res.data.data.nick_name, img: res.data.data.profile});
         setStatistics(res.data.data.one_month_statistics);
 
         const rentalBook = res.data.data.rental_book;
@@ -45,6 +45,8 @@ export default function MyProfile() {
         borrowBook = borrowBook.map((e: MyBook) => (e.book_name.length > 8 ? {...e, book_name: e.book_name.slice(0, 8) + "..."} : e));
         setBorrowBooks(borrowBook);
 
+        let reserveBook = res.data.data.reservation_book;
+        reserveBook = reserveBook.map((e: MyBook) => (e.book_name.length > 8 ? {...e, book_name: e.book_name.slice(0, 8) + "..."} : e));
         setReserveBooks(res.data.data.reservation_book);
 
         let overdueBook = rentalBook.filter((e: MyBook) => e.is_over_due);
@@ -170,14 +172,16 @@ export default function MyProfile() {
                   <S.EditInputTitle>닉네임</S.EditInputTitle>
                   <S.EditInput
                     onKeyDown={async (e) => {
-                      if(editName.length < 3 || editName.length > 16){
-                        alert("이름은 3 ~ 16자 사이어야 합니다")
-                        return;
-                      }
-                      setUser({ ...user, nickName: editName });
-                      setEditModal(false);
-                      await putEditUserName(user.id, editName);
-                    }}
+                      if(e.key === "Enter"){
+                        if(editName.length < 3 || editName.length > 16){
+                          alert("이름은 3 ~ 16자 사이어야 합니다")
+                          return;
+                        }
+                        setUser({ ...user, nickName: editName });
+                        setEditModal(false);
+                        await putEditUserName(user.id, editName);
+                      }}
+                    }
                     allow={true}
                     weight={600}
                     color="#5A5A5A"
@@ -230,7 +234,9 @@ export default function MyProfile() {
                 </S.EditInputBox>
                 <S.EditInputBox>
                   <S.EditInputTitle><img src={lock} />로그아웃</S.EditInputTitle>
-                  <S.EditBox onClick={() => navigate("/idPasswordFind")}>
+                  <S.EditBox onClick={async () => {
+                    await postLogout();
+                  }}>
                     <S.EditInput
                       readOnly
                       allow={true}

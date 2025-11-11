@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { BaseModal } from "../baseModal";
 import * as S from "./styleB"
-import { deleteUser } from "../../../api/my";
+import { deleteUser, postLogout } from "../../../api/my";
 
 export default function DeleteUserModal({ onClose }: { onClose: () => void }) {
   const [nextStep, setNextStep] = useState(false);
@@ -18,8 +18,9 @@ export default function DeleteUserModal({ onClose }: { onClose: () => void }) {
             <S.NoButton onClick={onClose}>이전</S.NoButton>
             <S.YesButton onClick={async () => {
               await deleteUser();
+              await postLogout();
               setNextStep(true);
-            }}>탈퇴합니다</S.YesButton>
+            }}>탈퇴</S.YesButton>
           </S.ButtonBox>
         </S.Container>
       </BaseModal>
