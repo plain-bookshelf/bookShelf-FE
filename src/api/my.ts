@@ -19,3 +19,7 @@ export const patchEditUserImg = async (userId: string, userImg: string) => {
 export const deleteUser = async () => {
   return await instance.delete(`/api/auth/delete`);
 } 
+
+export const postLogout = async () => {
+  return await instance.post(`/api/auth/logout`);
+}

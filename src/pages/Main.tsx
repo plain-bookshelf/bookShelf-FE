@@ -1,21 +1,22 @@
 import SearchBar from "../components/searchBar/SearchBar"
 import * as B from "../components/book/Book"
-import type { Book } from "../types/Book"
+import type { Book, SearchBook } from "../types/Book"
 import { useEffect, useState } from "react"
 import { Line, LineContainer } from "../components/book/style"
 import styled from "styled-components"
 import searchResult from "../assets/searchResult.png"
 import { getBookSearch, getMain } from "../api/main"
 import { useUser } from "../components/contexts/UserContext"
+import Loading from "../components/loading/loading"
 
 export default function Main() {
   const { user, setUser } = useUser();
-  const [searchBookList, setSearchBookList] = useState<Book[]>([]);
+  const [searchBookList, setSearchBookList] = useState<SearchBook[]>([]);
   const [popularBookList, setPopularBookList] = useState<Book[]>([]);
   const [newBookList, setNewBookList] = useState<Book[]>([]);
   const [search, setSearch] = useState<Boolean>(false);
   const [query, setQuery] = useState<string>("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -25,6 +26,7 @@ export default function Main() {
         setPopularBookList(res.data.data.book_popularity_list_response_dto);
         setNewBookList(res.data.data.book_recent_list_response_dto);
         setUser({...user, img: res.data.data.profile, id: res.data.data.member_id});
+        setLoading(false);
       } catch(error) {
         console.error(error);
       }
@@ -74,7 +76,7 @@ export default function Main() {
             book_name={e.book_name}
             author={e.author}
             book_type={e.book_type}
-            book_image_url={e.book_image_url}
+            book_image_url={e.book_image}
           />
         ))}
         </B.BookList>
@@ -88,7 +90,7 @@ export default function Main() {
       </Container>
     }
 
-    {!search &&
+    {!search && !loading &&
       <B.BookList BookListTitle="인기 도서">
         {popularBookList.map((e, index) => (
           <B.Popular 
@@ -103,11 +105,13 @@ export default function Main() {
       </B.BookList>
     }
 
+    {!loading &&
     <LineContainer>
       {!search && <Line />}
     </LineContainer>
+    }
 
-    {!search &&
+    {!search && !loading &&
       <B.BookList BookListTitle="최신 도서">
         {newBookList.map((e) => (
           <B.Book
@@ -120,6 +124,7 @@ export default function Main() {
         ))}
       </B.BookList>
     }
+    <Loading loading={loading} />
   </>)
 }
 

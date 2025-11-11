@@ -125,8 +125,8 @@ export default function EditModal({ onClose }: { onClose: () => void }) {
             <S.BoxInput type="button" value="확인" onClick={async () => {
               const croppedUrl = await getCroppedImg(preview, croppedAreaPixels);
               setUser({ ...user, img: croppedUrl });
+              await patchEditUserImg(user.id, croppedUrl);
               onClose();
-              await patchEditUserImg(user.id, user.img);
             }} />
           </S.BoxA>
       </BaseModal>

@@ -4,7 +4,16 @@ export type Book = {
   author: string;
   book_type: string;
   book_image_url: string;
-  rank?: number;
+  rank?: number
+}
+
+export type SearchBook = {
+  id: number;
+  book_name: string;
+  author: string;
+  book_type: string;
+  book_image: string;
+  rank?: number
 }
 
 export type MyBook = {

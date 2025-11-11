@@ -5,10 +5,8 @@ import { useList } from "../components/contexts/BorrowListContext";
 import { useState, useEffect } from "react";
 import SearchBar from "../components/searchBar/SearchBar";
 import { getOverdueList, getRentalList, getUserSearch } from "../api/manage";
-import { useUser } from "../components/contexts/UserContext";
 
 export default function BorrowList() {
-  const { user } = useUser();
   const { listData, setListData } = useList();
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
