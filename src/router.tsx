@@ -34,8 +34,7 @@ export default function Router() {
           <Route path="/showId" element={<ShowId/>}/>
           <Route path="/pwReset" element={<PwReset/>}/>
           <Route path="/checkEmailPwReset" element={<CheckEmailPwReset/>}/>
-          <Route path="/book/:bookId" element={<BookDetail/>}/>
-          {/* <Route path="/bookDetail" element={<BookDetail/>}/> */}
+          <Route path="/books/:bookId" element={<BookDetail/>}/>
           <Route path="/showPw" element={<ShowPw/>}/>
           <Route path="/MyPwReset" element={<MyPwReset/>}/>
           <Route path="/recommand" element={<RecommandList />} />

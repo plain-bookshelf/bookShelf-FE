@@ -7,8 +7,9 @@ import type {
   EmailVerifyResponse,
 } from "../types/emailTypes";
 
-const EMAIL_BASE = "/email"; // ✅ 여기 중요
+const EMAIL_BASE = "/email";
 
+/** 이메일 인증코드 전송: POST /api/email/send */
 export async function sendEmailVerification(
   address: string
 ): Promise<ApiResponse> {
@@ -19,6 +20,7 @@ export async function sendEmailVerification(
       `${EMAIL_BASE}/send`,
       body
     );
+
     if (res.status === 201 || res.data.status === "CREATED") {
       return res.data;
     }
@@ -32,6 +34,7 @@ export async function sendEmailVerification(
   }
 }
 
+/** 이메일 인증코드 검증: PUT /api/email/verify */
 export async function verifyEmailCode(
   address: string,
   verificationCode: string
@@ -46,9 +49,11 @@ export async function verifyEmailCode(
       `${EMAIL_BASE}/verify`,
       body
     );
+
     if (res.status === 201 || (res.data as any).status === "CREATED") {
       return res.data;
     }
+
     throw new Error(
       (res.data as any)?.message || "인증번호 확인에 실패했습니다."
     );

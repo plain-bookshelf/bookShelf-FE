@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "../layouts/pageWrapper";
 import { postLogin } from "../api/authApi";
+import { setTokens } from "../utils/tokenService";
 
 export default function LogIn() {
   const [identifier, setIdentifier] = useState("");
@@ -32,30 +33,20 @@ export default function LogIn() {
     setIsLoading(true);
 
     try {
-      const loginRequestData = {
+      const tokenData = await postLogin({
         credential: identifier,
-        password: password,
-      };
+        password,
+      });
 
-      const res = await postLogin(loginRequestData);
-      const tokenData = res.data;
+      // 🔑 여기서 꼭 저장해야 함
+      setTokens(tokenData, false); // rememberMe 옵션 있으면 true/false로 분기
 
-      // 명세서 응답 기준으로 저장
-      sessionStorage.setItem("access_token", tokenData.access_token);
-      sessionStorage.setItem("refresh_token", tokenData.refresh_token);
-      sessionStorage.setItem(
-        "user",
-        JSON.stringify({ identifier })
-      );
-
-      console.log("Login successful. Access Token saved.");
       navigate("/");
-    } catch (err) {
+    } catch (err: any) {
       const msg =
         err instanceof Error
           ? err.message
           : "알 수 없는 로그인 오류가 발생했습니다.";
-      console.error("Login error:", err);
       setError(msg);
       setLoginError(true);
     } finally {

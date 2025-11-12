@@ -1,32 +1,62 @@
-import type{ LoginTokenData } from '../types/authTypes';
-
 const ACCESS_TOKEN_KEY = "access_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
+const EXPIRES_AT_KEY = "access_token_expires_at"; // number (ms)
 
+const storage = window.sessionStorage;
+// const storage = window.localStorage; // 이렇게 바꾸면 localStorage 사용
 
- // Access Token을 가져옴.
-export const getAccessToken = (): string | null => {
-  return sessionStorage.getItem(ACCESS_TOKEN_KEY);
-};
+export interface TokenPayload {
+  access_token: string;
+  refresh_token: string;
+  expires_in?: number; // 서버 응답: 절대 만료시간(ms) 또는 남은 초(second) 둘 다 대응
+}
 
-// Refresh Token을 가져옴.
-export const getRefreshToken = (): string | null => {
-  return sessionStorage.getItem(REFRESH_TOKEN_KEY);
-};
+export function setTokens(payload: TokenPayload) {
+  const { access_token, refresh_token, expires_in } = payload;
 
+  if (access_token) {
+    storage.setItem(ACCESS_TOKEN_KEY, access_token);
+  }
+  if (refresh_token) {
+    storage.setItem(REFRESH_TOKEN_KEY, refresh_token);
+  }
 
- // 토큰 정보를 저장
-export const setTokens = (tokenData: LoginTokenData): void => {
-  sessionStorage.setItem(ACCESS_TOKEN_KEY, tokenData.access_token);
-  sessionStorage.setItem(REFRESH_TOKEN_KEY, tokenData.refresh_token);
-};
+  if (expires_in) {
+    let expiresAt: number;
 
+    // 1. 값이 13자리 이상이면: 이미 epoch(ms)라고 가정
+    if (expires_in > 1_000_000_000_000) {
+      expiresAt = expires_in;
+    } else {
+      // 2. 아니면: seconds 로 보고 현재 시간 기준 계산
+      expiresAt = Date.now() + expires_in * 1000;
+    }
 
- //모든 토큰을 제거 (로그아웃/세션 만료 시)
-export const removeTokens = (): void => {
-  sessionStorage.removeItem(ACCESS_TOKEN_KEY);
-  sessionStorage.removeItem(REFRESH_TOKEN_KEY);
+    storage.setItem(EXPIRES_AT_KEY, String(expiresAt));
+  }
+}
 
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
-};
+export function getAccessToken(): string | null {
+  return storage.getItem(ACCESS_TOKEN_KEY);
+}
+
+export function getRefreshToken(): string | null {
+  return storage.getItem(REFRESH_TOKEN_KEY);
+}
+
+export function getAccessTokenExpiresAt(): number | null {
+  const raw = storage.getItem(EXPIRES_AT_KEY);
+  return raw ? Number(raw) : null;
+}
+
+export function isAccessTokenExpired(): boolean {
+  const exp = getAccessTokenExpiresAt();
+  if (!exp) return false; // 만료 정보를 안 주는 서버라면, 401에만 반응
+  return Date.now() > exp;
+}
+
+export function removeTokens() {
+  storage.removeItem(ACCESS_TOKEN_KEY);
+  storage.removeItem(REFRESH_TOKEN_KEY);
+  storage.removeItem(EXPIRES_AT_KEY);
+}

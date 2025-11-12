@@ -1,99 +1,100 @@
 import axios from "axios";
 import axiosInstance from "./apiClient";
+import {
+  getAccessToken,
+  getRefreshToken,
+} from "../utils/tokenService";
 import type {
   LoginRequest,
-  ApiResponse,
   LoginTokenData,
   TokenReissueRequest,
-  LoginTokenData as TokenReissueResponseData,
+  TokenReissueResponseData,
 } from "../types/authTypes";
-import { getRefreshToken, removeTokens } from "../utils/tokenService";
+
+interface ApiSuccessResponse<T> {
+  status: string; // "CREATED"
+  message: string;
+  data: T;
+}
+
+interface ApiErrorResponse {
+  status?: string;
+  code?: string; // "A004", "M001" 등 서버에서 내려주는 경우
+  message?: string;
+}
 
 const AUTH_BASE = "/auth";
 
 /**
- * 1. 로그인 (POST /api/auth/login)
- * - 토큰 필요 없음
+ * 로그인: POST /api/auth/login
  */
 export const postLogin = async (
   loginData: LoginRequest
-): Promise<ApiResponse<LoginTokenData>> => {
-  try {
-    const res = await axiosInstance.post<ApiResponse<LoginTokenData>>(
-      `${AUTH_BASE}/login`,
-      loginData
-    );
-    return res.data;
-  } catch (error: any) {
-    if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
-    }
-    throw new Error("네트워크 오류가 발생했습니다.");
+): Promise<LoginTokenData> => {
+  const res = await axiosInstance.post<ApiSuccessResponse<LoginTokenData>>(
+    `${AUTH_BASE}/login`,
+    loginData
+  );
+
+  // 명세상 201 CREATED 이지만, 혹시 200 쓸 수도 있으니 둘 다 허용
+  if (res.status !== 200 && res.status !== 201) {
+    throw new Error("LOGIN_FAILED");
   }
+
+  return res.data.data;
 };
 
-/**
- * 2. 토큰 재발급 (POST /api/auth/reissue)
- * - refresh_token 필요
- * - 여기서는 공용 axiosInstance 대신, CORS/인터셉터 영향 없는 전용 axios 사용
- */
-export const postTokenReissue = async (
-  reissueData: TokenReissueRequest
-): Promise<ApiResponse<TokenReissueResponseData>> => {
-  const refreshToken = getRefreshToken() || reissueData.refresh_token;
+//토큰 재발급: POST /api/auth/reissue
+export const postTokenReissue = async (): Promise<TokenReissueResponseData> => {
+  const accessToken = getAccessToken();
+  const refreshToken = getRefreshToken();
 
-  if (!refreshToken) {
-    throw new Error("리프레시 토큰이 없어 재발급을 시도할 수 없습니다.");
+  if (!accessToken || !refreshToken) {
+    throw new Error("NO_TOKENS");
   }
 
-  // 프록시 기준 상대 경로 사용
-  const reissueClient = axios.create({
-    baseURL: "/api",
+  const body: TokenReissueRequest = {
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  };
+
+  const res = await axios.post<
+    ApiSuccessResponse<TokenReissueResponseData> | ApiErrorResponse
+  >("/api/auth/reissue", body, {
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${refreshToken}`,
+      Authorization: `Bearer ${accessToken}`,
     },
+    // 여기서 직접 status 보고 판단할 거라서 모두 허용
+    validateStatus: () => true,
   });
 
-  const res = await reissueClient.post<
-    ApiResponse<TokenReissueResponseData>
-  >(`${AUTH_BASE}/reissue`, reissueData);
-
-  if (res.status !== 201) {
-    throw new Error(
-      `토큰 재발급에 실패했습니다. (HTTP ${res.status})`
-    );
+  // 성공: 201 CREATED
+  if (res.status === 201 || res.status === 200) {
+    const data = (res.data as ApiSuccessResponse<TokenReissueResponseData>).data;
+    if (!data?.access_token || !data?.refresh_token) {
+      throw new Error("REISSUE_INVALID_RESPONSE");
+    }
+    return data;
   }
 
-  return res.data;
-};
+  // 에러 응답 파싱
+  const err = res.data as ApiErrorResponse;
 
-/**
- * 3. 로그아웃 (POST /api/auth/logout)
- */
-export const postLogout = async (): Promise<void> => {
-  try {
-    const res = await axiosInstance.post(
-      `${AUTH_BASE}/logout`,
-      {},
-      {
-        validateStatus: (status) => status === 200 || status === 204,
-      }
-    );
-
-    if (res.status === 204) {
-      console.log("로그아웃 성공: 204 No Content");
-    } else if (res.status === 200) {
-      console.log("로그아웃 성공: 200 OK");
-    }
-
-    removeTokens();
-  } catch (error: any) {
-    if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
-    }
-    throw new Error(
-      "네트워크 오류 또는 알 수 없는 오류로 로그아웃에 실패했습니다."
-    );
+  if (res.status === 401) {
+    // *REFRESH_TOKEN_NOT_MATCH*
+    // code: "A004"
+    throw new Error("REFRESH_TOKEN_INVALID");
   }
+
+  if (res.status === 404) {
+    // MEMBER_NOT_FOUND
+    // code: "M001"
+    throw new Error("MEMBER_NOT_FOUND");
+  }
+
+  // 그 외는 전부 재발급 실패로 처리
+  throw new Error(
+    `REISSUE_FAILED:${err.code || res.status}:${err.message || ""}`.trim()
+  );
 };

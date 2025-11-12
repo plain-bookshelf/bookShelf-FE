@@ -6,17 +6,15 @@ import type {
   apiResponse,
 } from "../types/signupTypes";
 
-const SIGNUP_ENDPOINT = "/auth/signup"; // 🔴 여기만 유지
+const SIGNUP_ENDPOINT = "/auth/signup";
 
 export async function signup(
   data: signupRequest
 ): Promise<signupResponse> {
-  const requestBody = { ...data };
-
   try {
     const res = await axiosInstance.post<
       apiResponse<signupResponse>
-    >(SIGNUP_ENDPOINT, requestBody);
+    >(SIGNUP_ENDPOINT, data);
 
     return res.data.data;
   } catch (error: any) {
