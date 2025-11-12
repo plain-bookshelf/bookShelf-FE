@@ -1,5 +1,5 @@
 export interface ApiResponse {
-    status: "success" | "fail" | "error";
+     status: "success" | "fail" | "error" | "CREATED";
     message: string;
     data: Record<string, unknown>; 
 }

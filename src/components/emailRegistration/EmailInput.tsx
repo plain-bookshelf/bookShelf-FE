@@ -12,10 +12,10 @@ export function EmailInput() {
   const [verificationCode, setVerificationCode] = useState("")
   const [isVerificationSent, setIsVerificationSent] = useState(false)
   const [isVerified, setIsVerified] = useState(false)
-
   const [verificationError, setVerificationError] = useState("")
   const [emailError, setEmailError] = useState(false)
   const [isRequesting, setIsRequesting] = useState(false)
+  const [nextError, setNextError] = useState("");
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[a-z0-9+-_@.]+@[a-z0-9-]+\.[a-z0-9-.]+$/
@@ -55,6 +55,38 @@ export function EmailInput() {
     }
   }
 
+  const handleNext = () => {
+  const trimmedEmail = email.trim()
+  setNextError("")
+
+  // 1. 이메일을 아예 안쓴 경우
+  if (!trimmedEmail) {
+    navigate("/signup")
+    return
+  }
+
+  // 2. 이메일 형식이 잘못된 경우
+  if (!validateEmail(trimmedEmail)) {
+    setEmailError(true)
+    setNextError("올바른 이메일 형식을 입력해 주세요.")
+    return
+  }
+
+  // 3. 이메일은 썼는데 인증이 안 된 경우
+  if (!isVerified) {
+    setNextError("이메일 인증을 완료해야 다음 단계로 이동할 수 있습니다.")
+    return
+  }
+
+  // 4. 모든 조건 통과 → 회원가입 페이지로 이동
+  navigate("/signup", {
+    state: {
+      emailAddress: trimmedEmail,
+      isEmailVerified: true,
+    },
+  })
+}
+
   // 이메일 인증 확인 (PUT /email/verify)
   const handleVerification = async () => {
     if (!email || !verificationCode || !isVerificationSent || isVerified || isRequesting) return;
@@ -81,26 +113,9 @@ export function EmailInput() {
     }
   }
 
-  const handleNext = () => {
-      const isEmailProvided = email.trim().length > 0;
-      
-      
-      // 1. 이메일을 입력했는데 인증이 완료되지 않았다면 이동을 막음
-      if (isEmailProvided && !isVerified) {
-          alert("이메일 등록을 진행하려면 이메일 인증을 완료해야 합니다.");
-          return;
-      }
-      
-      // 2. 회원가입 페이지로 이동 시 이메일 데이터(state)를 전달
-      //    이메일을 등록하지 않았다면 (email이 "") 빈 문자열이 전달됩니다.
-      navigate("/signup", { 
-          state: { 
-              emailAddress: email.trim(), // ⬅️ 입력된 이메일 또는 "" 전달
-              isEmailVerified: isVerified && isEmailProvided // 이메일이 있고 인증된 경우만 true
-          } 
-      });
-  }
-
+  
+  
+ 
   return (
     <S.EmailContent>
       <S.TextContainer>
@@ -127,6 +142,7 @@ export function EmailInput() {
                 onChange={(e) => {
                   setEmail(e.target.value)
                   setEmailError(false)
+                  setNextError("")
                 }}
                 // 인증 요청이 완료되었거나, 인증이 완료되었거나, API 요청 중일 때 비활성화
                 disabled={isVerificationSent || isVerified || isRequesting} 
@@ -160,6 +176,7 @@ export function EmailInput() {
                 onChange={(e) => {
                   setVerificationCode(e.target.value)
                   setVerificationError("")
+                  setNextError("")
                 }}
                 disabled={!isVerificationSent || isVerified || isRequesting}
               />
@@ -175,9 +192,9 @@ export function EmailInput() {
           {verificationError && 
           <S.ErrorMessage>
             <img src={danger} alt="danger icon"/>
-            {verificationError} 
+            {verificationError || nextError} 
           </S.ErrorMessage>}
-        <S.NextButton onClick={handleNext} disabled={email.trim().length > 0 && !isVerified}>다음</S.NextButton>
+        <S.NextButton onClick={handleNext}>다음</S.NextButton>
       </S.InputContainer>
     </S.EmailContent>
   )

@@ -1,4 +1,4 @@
-import * as S from "./headerStyle";
+import * as S from "./adminHeaderStyle";
 import headerLogo from "../../assets/headerLogo.svg";
 import defaultUserIcon from "../../assets/user.svg";
 import home from "../../assets/home.png";
@@ -36,18 +36,10 @@ function Header() {
       />
 
       <S.PageContent>
-        <S.BookRequest onClick={() => handleProtectedNav("/temp")}>
-          도서신청
-        </S.BookRequest>
-        <S.FindFavoriteBooks onClick={() => handleProtectedNav("/recommand")}>
-          내 취향 도서 찾기
-        </S.FindFavoriteBooks>
-        <S.MyPage onClick={() => handleProtectedNav("/My")}>
-          마이페이지
-        </S.MyPage>
-        <S.AiPage onClick={() => handleProtectedNav("/Ai")}>
-          마루 Ai
-        </S.AiPage>
+        <S.PageText onClick={() => handleProtectedNav("/temp")}>대여 승인</S.PageText>
+        <S.PageText onClick={() => handleProtectedNav("/recommand")}>
+          대여 목록
+        </S.PageText>
       </S.PageContent>
 
       {isLoggedIn ? (

@@ -4,8 +4,9 @@ import { Provider as UserProvider} from "./components/contexts/UserContext";
 import { Provider as ManagerProvider } from "./components/contexts/ManagementContext";
 import { Provider as ListProvider } from "./components/contexts/BorrowListContext";
 
-function App() {  
-  const queryClient = new QueryClient();
+
+ function App() {  
+   const queryClient = new QueryClient();
 
   return (
     <UserProvider>

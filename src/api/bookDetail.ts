@@ -1,0 +1,91 @@
+import type { BookDetailData, CollectionItem } from "../types/bookTypes";
+import axiosInstance from "./apiClient";
+import { getAccessToken } from "../utils/tokenService";
+
+interface CollectionInfoDto {
+  affiliation: string;
+  registration_number: string;
+  call_number: string;
+  rental_status: boolean;
+}
+
+interface BookDetailApiData {
+  book_id: number;
+  book_name: string;
+  publisher: string | null;
+  book_image_url: string | null;
+  book_introduction: string | null;
+  book_type: string | null;
+  book_date: string | null;
+  like_count: number;
+  collection_information_response_dtos: CollectionInfoDto[];
+  review_response_dtos: any[];
+}
+
+interface BookDetailApiResponse {
+  status: string; // "OK"
+  message: string;
+  data: BookDetailApiData;
+}
+
+const mapCollection = (dtos: CollectionInfoDto[]): CollectionItem[] =>
+  dtos.map((item) => ({
+    id: item.registration_number,
+    library: item.affiliation,
+    callNumber: item.call_number,
+    status: item.rental_status ? "대출중" : "대출가능",
+    dueDate: undefined,
+  }));
+
+const mapToBookDetailData = (data: BookDetailApiData): BookDetailData => {
+  const collection = mapCollection(data.collection_information_response_dtos);
+
+  return {
+    bookId: data.book_id,
+    title: data.book_name,
+    coverImage: data.book_image_url ?? "/images/default-book-cover.png",
+    author: "",
+    publisher: data.publisher ?? "",
+    pubYear: data.book_date ? Number(data.book_date.slice(0, 4)) : undefined,
+    registrationId: collection[0]?.id ?? "",
+    releaseDate: data.book_date ?? "",
+    summary: data.book_introduction ?? "등록된 소개가 없습니다.",
+    categories: data.book_type ? [data.book_type] : [],
+    collection,
+  };
+};
+
+export const getBookDetail = async (
+  bookId: number | string
+): Promise<BookDetailData> => {
+  console.log("[getBookDetail] 호출, bookId =", bookId);
+  
+  console.log("[CALL] getBookDetail token:", (getAccessToken()||"").slice(0,12), "...", (getAccessToken()||"").slice(-12));
+  try {
+    const res = await axiosInstance.get<BookDetailApiResponse>(
+      `/book/${bookId}`
+    );
+    console.log("[getBookDetail] 응답:", res.data);
+
+    if (res.data.status !== "OK" || !res.data.data) {
+      console.error("[getBookDetail] INVALID_RESPONSE:", res.data);
+      throw new Error("INVALID_RESPONSE");
+    }
+
+    return mapToBookDetailData(res.data.data);
+  } catch (err: any) {
+    if (err.response) {
+      const { status, data } = err.response;
+      console.error("[getBookDetail] 응답 에러:", status, data);
+
+      if (status === 401) throw new Error("UNAUTHORIZED");
+      if (status === 404) throw new Error("NOT_FOUND");
+    } else if (err.request) {
+      console.error("[getBookDetail] 요청 보냈지만 응답 없음:", err.request);
+    } else {
+      console.error("[getBookDetail] 구성 에러:", err.message);
+    }
+
+    throw new Error("FETCH_FAILED");
+  }
+};

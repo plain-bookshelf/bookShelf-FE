@@ -3,7 +3,6 @@ export interface LoginRequest {
   password: string;
 }
 
-
 export interface LoginTokenData {
   grant_type: "Bearer";
   access_token: string;
@@ -11,9 +10,8 @@ export interface LoginTokenData {
   refresh_token: string;
 }
 
-
 export interface ApiResponse<T> {
-  status: "OK" | string;
+  status: string;  // "CREATED", "OK" 등
   message: string;
   data: T;
 }
