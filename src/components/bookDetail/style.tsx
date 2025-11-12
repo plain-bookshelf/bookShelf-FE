@@ -203,8 +203,9 @@ export const TableBody = styled.tbody`
     font-size: 16px;
   }
 `
-export const StatusCell = styled.td<{ $status: '대출중' | '대출가능' }>`
-  color: ${(props) => (props.$status === '대출중' ? '#8D8D8D' : '#00C471')};
+export const StatusCell = styled.td<{ $status: '대출중' | '대출가능' | '예약중' }>`
+  color: ${(props) => (props.$status === '대출중'  ? '#8D8D8D' : '#00C471')};
+  color: ${(props) => (props.$status === '예약중'  ? '#8D8D8D' : '#00C471')};
   font-weight: bold;
 `
 

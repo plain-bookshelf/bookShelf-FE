@@ -51,7 +51,7 @@ export async function requestBookReservation(
     }
 
     return res.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
 
@@ -63,7 +63,7 @@ export async function requestBookReservation(
       }
 
       const apiMessage =
-        (error.response?.data as any)?.message ||
+        (error.response?.data as { message?: string })?.message ||
         "도서 예약 요청 중 오류가 발생했습니다.";
       throw new Error(apiMessage);
     }

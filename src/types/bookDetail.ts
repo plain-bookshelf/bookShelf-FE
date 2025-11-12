@@ -15,7 +15,7 @@ export interface BookDetailApiData {
   book_date: string | null;      // 발매일(또는 출간일)
   like_count: number;
   collection_information_response_dtos: CollectionInfoDto[];
-  review_response_dtos: any[];   // 나중에 필요하면 타입 정의
+  review_response_dtos: unknown[];   // 나중에 필요하면 타입 정의
 }
 
 export interface BookDetailApiResponse {

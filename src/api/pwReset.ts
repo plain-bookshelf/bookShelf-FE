@@ -1,3 +1,4 @@
+import axios from "axios";
 import axiosInstance from "./apiClient";
 
 interface BaseResponse<T = string> {
@@ -16,20 +17,17 @@ export const sendFindPasswordEmail = async (address: string): Promise<void> => {
     const res = await axiosInstance.post<BaseResponse>(
       "/api/auth/find-password/send",
       { address },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+      { headers: { "Content-Type": "application/json" } }
     );
 
     if (res.status !== 200 || res.data.status !== "OK") {
       throw new Error("SEND_FAILED");
     }
-  } catch (error: any) {
-    if (error.response?.status === 404) {
-      // *EMAIL_NOT_FOUND*
-      throw new Error("EMAIL_NOT_FOUND");
+  } catch (error: unknown) {                             
+    if (axios.isAxiosError(error) && error.response) {
+      if (error.response.status === 404) {
+        throw new Error("EMAIL_NOT_FOUND");
+      }
     }
     throw new Error("SEND_FAILED");
   }
@@ -47,26 +45,19 @@ export const verifyFindPasswordCode = async (
   try {
     const res = await axiosInstance.post<BaseResponse<boolean>>(
       "/api/auth/find-password/verify",
-      {
-        address,
-        verification_code: verificationCode,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+      { address, verification_code: verificationCode },
+      { headers: { "Content-Type": "application/json" } }
     );
 
     if (res.status !== 200 || res.data.status !== "OK") {
       throw new Error("VERIFY_FAILED");
     }
-
     return res.data.data === true;
-  } catch (error: any) {
-    // 스펙상 404만 명시돼 있고, 디테일 코드는 따로 안 줬으니 통합 처리
-    if (error.response?.status === 404) {
-      throw new Error("VERIFY_FAILED");
+  } catch (error: unknown) {                               
+    if (axios.isAxiosError(error) && error.response) {
+      if (error.response.status === 404) {
+        throw new Error("VERIFY_FAILED");
+      }
     }
     throw new Error("VERIFY_FAILED");
   }
@@ -84,24 +75,18 @@ export const resetPasswordByFind = async (
   try {
     const res = await axiosInstance.patch<BaseResponse>(
       "/api/auth/find-password/retouch",
-      {
-        username,
-        password: newPassword,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+      { username, password: newPassword },
+      { headers: { "Content-Type": "application/json" } }
     );
 
     if (res.status !== 201 || res.data.status !== "CREATED") {
       throw new Error("RETOUCH_FAILED");
     }
-  } catch (error: any) {
-    if (error.response?.status === 404) {
-      // *MEMBER_NOT_FOUND*
-      throw new Error("MEMBER_NOT_FOUND");
+  } catch (error: unknown) {                            
+    if (axios.isAxiosError(error) && error.response) {
+      if (error.response.status === 404) {
+        throw new Error("MEMBER_NOT_FOUND");
+      }
     }
     throw new Error("RETOUCH_FAILED");
   }

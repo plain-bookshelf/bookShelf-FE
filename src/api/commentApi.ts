@@ -1,3 +1,4 @@
+import axios from "axios";
 import axiosInstance from "./apiClient";
 
 /** 댓글 작성 응답 */
@@ -52,14 +53,15 @@ export const postCommentWrite = async (
       res.data?.message ||
         "댓글 작성 중 알 수 없는 오류가 발생했습니다."
     );
-  } catch (error: any) {
-    if (error.response?.status === 404) {
-      throw new Error("대상 리소스를 찾을 수 없습니다. (404)");
+  }  catch (error: unknown) { // ✅ any 제거
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      const apiMessage = (error.response?.data as { message?: string } | undefined)?.message;
+
+      if (status === 404) throw new Error("댓글이 존재하지 않습니다. (BOOK_COMMENT_NOT_FOUND)");
+      if (apiMessage) throw new Error(apiMessage);
     }
-    if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
-    }
-    throw new Error("댓글 작성 요청 중 오류가 발생했습니다.");
+    throw new Error("댓글 좋아요 요청 중 오류가 발생했습니다.");
   }
 };
 
@@ -88,16 +90,18 @@ export const postCommentLike = async (
       res.data?.message ||
         "댓글 좋아요 처리 중 알 수 없는 오류가 발생했습니다."
     );
-  } catch (error: any) {
-    if (error.response?.status === 404) {
-      throw new Error("댓글이 존재하지 않습니다. (BOOK_COMMENT_NOT_FOUND)");
+  }catch (error: unknown) { // ✅ any 제거
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      const apiMessage = (error.response?.data as { message?: string } | undefined)?.message;
+
+      if (status === 400) throw new Error("회원정보가 일치하지 않습니다. (NOT_VALID_MEMBER_INFO)");
+      if (status === 404) throw new Error("댓글이 존재하지 않습니다. (BOOK_COMMENT_NOT_FOUND)");
+      if (apiMessage) throw new Error(apiMessage);
     }
-    if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
-    }
-    throw new Error("댓글 좋아요 요청 중 오류가 발생했습니다.");
+    throw new Error("댓글 삭제 요청 중 오류가 발생했습니다.");
   }
-};
+}
 
 /** 댓글 삭제: PATCH /api/book/comment/delete?commentId= */
 export const deleteComment = async (
@@ -126,19 +130,21 @@ export const deleteComment = async (
       res.data?.message ||
         "댓글 삭제 처리 중 알 수 없는 오류가 발생했습니다."
     );
-  } catch (error: any) {
-    const status = error.response?.status;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      const apiMessage = (error.response?.data as { message?: string } | undefined)?.message;
 
-    if (status === 400) {
-      throw new Error("회원정보가 일치하지 않습니다. (NOT_VALID_MEMBER_INFO)");
+      if (status === 400){ 
+        throw new Error("회원정보가 일치하지 않습니다. (NOT_VALID_MEMBER_INFO)");
+      }
+      if (status === 404){
+       throw new Error("댓글이 존재하지 않습니다. (BOOK_COMMENT_NOT_FOUND)");
+      } 
+      if (apiMessage){
+       throw new Error(apiMessage);
+      }  
     }
-    if (status === 404) {
-      throw new Error("댓글이 존재하지 않습니다. (BOOK_COMMENT_NOT_FOUND)");
-    }
-    if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
-    }
-
     throw new Error("댓글 삭제 요청 중 오류가 발생했습니다.");
   }
 };
@@ -169,12 +175,17 @@ export const retouchComment = async (
       res.data?.message ||
         "댓글 수정 처리 중 알 수 없는 응답이 반환되었습니다."
     );
-  } catch (error: any) {
-    if (error.response?.status === 404) {
-      throw new Error("댓글이 존재하지 않습니다. (BOOK_COMMENT_NOT_FOUND)");
-    }
-    if (error.response?.data?.message) {
-      throw new Error(error.response.data.message);
+  } catch (error: unknown) { // ✅ any 제거
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
+      const apiMessage = (error.response?.data as { message?: string } | undefined)?.message;
+
+      if (status === 404){
+       throw new Error("댓글이 존재하지 않습니다. (BOOK_COMMENT_NOT_FOUND)");
+      }  
+      if (apiMessage){
+       throw new Error(apiMessage);
+      }  
     }
     throw new Error("댓글 수정 요청 중 오류가 발생했습니다.");
   }

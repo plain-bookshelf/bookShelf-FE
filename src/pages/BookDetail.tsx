@@ -34,15 +34,16 @@ export default function BookDetail() {
         const data = await getBookDetail(bookId);
         console.log(data);
         setBook(data);
-      } catch (e: any) {
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e);
         //✅ 백엔드가 NO_TOKEN / UNAUTHORIZED 주면 로그인 요구
-        if (e.message === 'NO_TOKEN' || e.message === 'UNAUTHORIZED') {
+        if (msg === 'NO_TOKEN' || msg === 'UNAUTHORIZED') {
           alert('로그인 후 이용 가능한 서비스입니다.');
           navigate('/login');
           return;
         }
 
-        if (e.message === 'NOT_FOUND') {
+        if (msg === 'NOT_FOUND') {
           setError('존재하지 않는 도서입니다.');
         } else {
           setError('도서 정보를 불러오는 중 오류가 발생했습니다.');
@@ -90,8 +91,9 @@ export default function BookDetail() {
         );
 
         alert(res.message || '성공적으로 대출되었습니다.');
-      } catch (e: any) {
-        alert(e.message || '도서 대여 요청 중 오류가 발생했습니다.');
+      } catch (e: unknown) {
+         const msg = e instanceof Error ? e.message : '도서 대여 요청 중 오류가 발생했습니다.';
+        alert(msg);
       } finally {
         setActionLoading(false);
       }
@@ -117,8 +119,9 @@ export default function BookDetail() {
         );
 
         alert(res.message || '도서 예약이 완료되었습니다.');
-      } catch (e: any) {
-        alert(e.message || '도서 예약 요청 중 오류가 발생했습니다.');
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : '도서 예약 요청 중 오류가 발생했습니다.';
+        alert(msg);
       } finally {
         setActionLoading(false);
       }

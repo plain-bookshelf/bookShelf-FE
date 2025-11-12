@@ -47,7 +47,7 @@ export async function deleteAccount(): Promise<DeleteAccountResponse> {
       message: message || "successfully delete user.",
       data: data ?? "",
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     // axios 에러 처리
     if (axios.isAxiosError(error) && error.response) {
       const { status, data } = error.response as {

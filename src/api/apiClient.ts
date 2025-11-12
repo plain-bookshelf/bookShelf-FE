@@ -177,8 +177,8 @@ axiosInstance.interceptors.response.use(
       console.debug("[RETRY]", pure || originalConfig.url);
 
       return axiosInstance(originalConfig);
-    } catch (e: any) {
-      const msg = e?.message || "";
+    } catch (e: unknown) {
+      const msg = e instanceof Error  ? e.message : String(e);
 
       console.debug("[REFRESH] failed:", msg);
 

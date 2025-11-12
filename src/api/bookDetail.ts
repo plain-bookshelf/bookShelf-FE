@@ -1,6 +1,7 @@
 import type { BookDetailData, CollectionItem } from "../types/bookTypes";
 import axiosInstance from "./apiClient";
 import { getAccessToken } from "../utils/tokenService";
+import axios from "axios";
 
 interface CollectionInfoDto {
   affiliation: string;
@@ -19,7 +20,7 @@ interface BookDetailApiData {
   book_date: string | null;
   like_count: number;
   collection_information_response_dtos: CollectionInfoDto[];
-  review_response_dtos: any[];
+  review_response_dtos: unknown[];
 }
 
 interface BookDetailApiResponse {
@@ -73,17 +74,17 @@ export const getBookDetail = async (
     }
 
     return mapToBookDetailData(res.data.data);
-  } catch (err: any) {
-    if (err.response) {
-      const { status, data } = err.response;
-      console.error("[getBookDetail] 응답 에러:", status, data);
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      const status = err.response?.status;
+      console.error("[getBookDetail] 응답 에러:", status, err.response?.data);
 
       if (status === 401) throw new Error("UNAUTHORIZED");
       if (status === 404) throw new Error("NOT_FOUND");
-    } else if (err.request) {
-      console.error("[getBookDetail] 요청 보냈지만 응답 없음:", err.request);
+    } else if (err instanceof Error) {
+      console.error("[getBookDetail] 요청 보냈지만 응답 없음:", err.message);
     } else {
-      console.error("[getBookDetail] 구성 에러:", err.message);
+      console.error("[getBookDetail] 구성 에러:", err);
     }
 
     throw new Error("FETCH_FAILED");
