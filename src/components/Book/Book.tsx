@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { useRef, useState, useEffect } from "react";
 import scrollButton from "../../assets/scrollButton.png"
 import { BookNumber } from "../my/style";
+import undefindImg from "../../assets/undefindImg.png"
 
 type Props = {
   searchTitle?: string
@@ -43,7 +44,7 @@ export const BookList: React.FC<Props> = ({searchTitle, BookListTitle, children}
   }
 
   return(<>
-    <S.Title><span style={{color: "#00C471"}}>{searchTitle}</span>{BookListTitle}</S.Title>
+    {BookListTitle !== "검색 결과" && <S.Title><span style={{color: "#00C471"}}>{searchTitle}</span>{BookListTitle}</S.Title>}
     <S.Container>
       {showLeft &&
         <S.ScrollButton onClick={scrollLeft}>
@@ -65,12 +66,19 @@ export const BookList: React.FC<Props> = ({searchTitle, BookListTitle, children}
 
 export function Book({book_name, book_type, book_image_url, author}: Book) {
   const book_type_split = book_type.split(">");
-  const category = book_type_split[book_type_split.length-1];
+  let category = book_type_split[book_type_split.length-1];
+  if(category.length> 8){
+    category = category.slice(0, 8) + "...";
+  }
 
   let title = book_name;
   
   if(book_name.length > 8){
     title = book_name.slice(0, 8) + "...";
+  }
+
+  if(book_image_url === null){
+    book_image_url = undefindImg;
   }
 
   return(<>
@@ -101,6 +109,16 @@ export function Popular({book_name, book_type, book_image_url, author, rank}: Bo
     title = book_name.slice(0, 8) + "...";
   }
 
+  if(book_image_url === null){
+    book_image_url = undefindImg;
+  }
+
+  let book_author = author;
+
+  if(author.length > 8){
+    book_author = author.slice(0, 8) + "...";
+  }
+
   return(<>
     <S.Book>
       <img style={{height: 300}} src={book_image_url}/>
@@ -109,7 +127,7 @@ export function Popular({book_name, book_type, book_image_url, author, rank}: Bo
       </S.RankBox>
       <S.BookInfo>
         <S.BookTitle>{title}</S.BookTitle>
-        <S.Author>{author}</S.Author>
+        <S.Author>{book_author}</S.Author>
         <S.CategoryBox>
           <S.CategoryFilter>카테고리 분류</S.CategoryFilter>
           <S.Category>{category}</S.Category>

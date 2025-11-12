@@ -17,6 +17,7 @@ import RecommandList from "./pages/Recommand";
 import ChatBot from "./pages/chatBot";
 import AllowList from "./pages/borrowAllow";
 import BorrowList from "./pages/borrowList";
+import Layout from "./layouts/Layout";
 
 export default function Router() {
   return (

@@ -8,7 +8,10 @@ import EditModal from "../modal/styleA/EditModal";
 import lock from "../../assets/lock.png"
 import go from "../../assets/go.png"
 import { useNavigate } from "react-router-dom";
-import { getMyPage, getMyInfo, putEditUserName, patchEditUserImg } from "../../api/my";
+import { getMyPage, getMyInfo, putEditUserName, postLogout } from "../../api/my";
+import { getDayDiff } from "../../utils/daydiff";
+import deleteUser from "../../assets/deleteUser.png";
+import DeleteUserModal from "../modal/styleB/DeleteUserModal";
 
 export default function MyProfile() {
   const { user, setUser } = useUser();
@@ -17,40 +20,38 @@ export default function MyProfile() {
   const [overdueBooks, setOverdueBooks] = useState<MyBook[]>([]);
   const [penalty, setPenalty] = useState(0);
   const [statistics, setStatistics] = useState(0);
-  const [edit, setEdit] = useState(false);
+  const [deleteUserModal, setDeleteUserModal] = useState(false);
+  const [editModal, setEditModal] = useState(false);
   const [editImgModal, setEditImgModal] = useState(false);
   const [editName, setEditName] = useState(user.nickName);
   const navigate = useNavigate();
 
-  const getDayDiff = (targetDate: string) => {
-    const now = new Date();
-    const dueDate = new Date(targetDate);
-
-    const diffTime = dueDate.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    return diffDays;
-  };
+  useEffect(() => {
+    setEditName(user.nickName);
+  }, [user.nickName])
 
   useEffect(() => {
     const fetchData = async () => {
       try{
         console.log("정보 가져오는 중");
         const res = await getMyPage(user.id);
-        setUser({...user, nickName: res.data.data.nick_name});
+        setUser({...user, nickName: res.data.data.nick_name, img: res.data.data.profile});
         setStatistics(res.data.data.one_month_statistics);
 
         const rentalBook = res.data.data.rental_book;
 
         let borrowBook = rentalBook.filter((e: MyBook) => !e.is_over_due);
-        borrowBook = borrowBook.map((e: MyBook) => ({...e, day: getDayDiff(e.over_due_time!)}))
-        borrowBook = borrowBook.map((e: MyBook) => (e.book_name.length > 12 ? {...e, book_name: e.book_name.slice(0, 12) + "..."} : e))
+        borrowBook = borrowBook.map((e: MyBook) => ({...e, day: getDayDiff(e.over_due_time!)}));
+        borrowBook = borrowBook.map((e: MyBook) => (e.book_name.length > 8 ? {...e, book_name: e.book_name.slice(0, 8) + "..."} : e));
         setBorrowBooks(borrowBook);
 
+        let reserveBook = res.data.data.reservation_book;
+        reserveBook = reserveBook.map((e: MyBook) => (e.book_name.length > 8 ? {...e, book_name: e.book_name.slice(0, 8) + "..."} : e));
         setReserveBooks(res.data.data.reservation_book);
 
         let overdueBook = rentalBook.filter((e: MyBook) => e.is_over_due);
         overdueBook = overdueBook.map((e: MyBook) => ({...e, day: Math.abs(getDayDiff(e.over_due_time!))}))
+        overdueBook = overdueBook.map((e: MyBook) => (e.book_name.length > 8 ? {...e, book_name: e.book_name.slice(0, 8) + "..."} : e));
         setOverdueBooks(overdueBook);
 
         setPenalty(res.data.data.user_over_due_date);
@@ -63,7 +64,7 @@ export default function MyProfile() {
   }, [])
 
   const userEditInfo = async () => {
-    setEdit(true);
+    setEditModal(true);
 
     try {
       console.log("유저 정보 수정을 위한 정보 불러오는 중");
@@ -114,7 +115,7 @@ export default function MyProfile() {
             </S.InfoContainer>
           </S.ProfileContainer>
         </S.Container>
-          {!edit && <S.DetailInfoContainer>
+          {!editModal && <S.DetailInfoContainer>
             <S.DetailInfoBox>
               <S.DetailInfoTitle>대출</S.DetailInfoTitle>
               <S.DetailInfoList>
@@ -164,22 +165,23 @@ export default function MyProfile() {
               </S.DetailInfoList>
             </S.DetailInfoBox>
           </S.DetailInfoContainer>}
-          {edit && <S.EditContainer>
+          {editModal && <S.EditContainer>
             <S.EditTitle>유저 정보</S.EditTitle>
               <S.EditInputContainer>
                 <S.EditInputBox>
                   <S.EditInputTitle>닉네임</S.EditInputTitle>
                   <S.EditInput
-                    onKeyDown={(e) => {
-                      if(e.key == "Enter"){
+                    onKeyDown={async (e) => {
+                      if(e.key === "Enter"){
                         if(editName.length < 3 || editName.length > 16){
                           alert("이름은 3 ~ 16자 사이어야 합니다")
                           return;
                         }
-                        setUser({ ...user, nickName: editName })
-                        setEdit(false)
-                      }
-                    }}
+                        setUser({ ...user, nickName: editName });
+                        setEditModal(false);
+                        await putEditUserName(user.id, editName);
+                      }}
+                    }
                     allow={true}
                     weight={600}
                     color="#5A5A5A"
@@ -230,17 +232,51 @@ export default function MyProfile() {
                     <S.EditGo go={653}><img src={go} style={{cursor: "pointer"}} /></S.EditGo>
                   </S.EditBox>
                 </S.EditInputBox>
+                <S.EditInputBox>
+                  <S.EditInputTitle><img src={lock} />로그아웃</S.EditInputTitle>
+                  <S.EditBox onClick={async () => {
+                    await postLogout();
+                  }}>
+                    <S.EditInput
+                      readOnly
+                      allow={true}
+                      weight={500}
+                      bgColor="#f0f0f0"
+                      color="#5A5A5A"
+                      value="로그아웃 하러가기"
+                      style={{cursor: "pointer"}}
+                    />
+                    <S.EditGo go={653}><img src={go} style={{cursor: "pointer"}} /></S.EditGo>
+                  </S.EditBox>
+                </S.EditInputBox>
+                <S.EditInputBox>
+                  <S.EditInputTitle><img src={deleteUser} />회원탈퇴</S.EditInputTitle>
+                  <S.EditBox onClick={() => setDeleteUserModal(true)}>
+                    <S.EditInput
+                      readOnly
+                      allow={true}
+                      weight={500}
+                      bgColor="#f0f0f0"
+                      color="#5A5A5A"
+                      value="탈퇴진행"
+                      style={{cursor: "pointer"}}
+                    />
+                    <S.EditGo go={653}><img src={go} style={{cursor: "pointer"}} /></S.EditGo>
+                  </S.EditBox>
+                </S.EditInputBox>
               </S.EditInputContainer>
-            <S.Button onClick={() => {
+            <S.Button onClick={async () => {
               if(editName.length < 3 || editName.length > 16){
                 alert("이름은 3 ~ 16자 사이어야 합니다")
                 return;
               }
-              setUser({ ...user, nickName: editName })
-              setEdit(false)
+              setUser({ ...user, nickName: editName });
+              setEditModal(false);
+              await putEditUserName(user.id, editName);
               }}>확인</S.Button>
           </S.EditContainer>}
           {editImgModal && <EditModal onClose={() => setEditImgModal(false)}/>}
+          {deleteUserModal && <DeleteUserModal onClose={() => setDeleteUserModal(false)} />}
       </S.Banner>
     </>
   )
