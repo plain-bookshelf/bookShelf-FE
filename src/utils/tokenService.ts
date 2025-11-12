@@ -51,7 +51,7 @@ export function getAccessTokenExpiresAt(): number | null {
 
 export function isAccessTokenExpired(): boolean {
   const exp = getAccessTokenExpiresAt();
-  if (!exp) return false; // 만료 정보를 안 주는 서버라면, 401에만 반응
+  if (!exp) return false;
   return Date.now() > exp;
 }
 
