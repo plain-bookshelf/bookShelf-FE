@@ -31,7 +31,7 @@ export function ShowIdInfo() {
         <S.ShowIdInfoContainer>
           <S.ShowIdInfoContent>아이디: {FindId}</S.ShowIdInfoContent>
           <S.NextButton onClick={LoginButton}>확인</S.NextButton>
-          <S.PasswordReset to="/passwordReset">비밀번호 재설정</S.PasswordReset>
+          <S.PasswordReset to="/checkEmailPwReset">비밀번호 재설정</S.PasswordReset>
         </S.ShowIdInfoContainer>
       </S.ShowIdContent>
     </S.ShowIdContainer>
