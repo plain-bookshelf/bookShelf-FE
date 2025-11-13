@@ -5,6 +5,7 @@ import type { CollectionItem } from '../../types/bookTypes';
 interface CollectionTableProps {
   items: CollectionItem[];
   onAction: (action: 'loan' | 'reserve', itemId: string) => Promise<void> | void;
+  actionLoading?: boolean;
 }
 
 const CollectionTable: React.FC<CollectionTableProps> = ({ items, onAction }) => {
@@ -69,11 +70,8 @@ const CollectionTable: React.FC<CollectionTableProps> = ({ items, onAction }) =>
                   <S.ActionButton
                     $type={reserveType}
                     disabled={!isLoaned || isLoading}
-                    onClick={() =>
-                      isLoaned && !isLoading && handleClick('reserve', item.id)
-                    }
-                  >
-                    대출예약
+                    onClick={() => isLoaned && !isLoading && handleClick('reserve', item.id)}>
+                    {isLoading && loadingId === item.id ? '예약 중...' : '대출예약'}
                   </S.ActionButton>
                 </td>
               </tr>

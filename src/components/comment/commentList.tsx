@@ -2,7 +2,7 @@ import React from 'react';
 
 import * as S from './commentStyle';
 import type { Comment } from '../../types/bookTypes';
-import user from "../../assets//user.svg";
+import user from "../../assets/user.svg";
 import like from '../../assets/like.svg'
 
 interface CommentListProps {

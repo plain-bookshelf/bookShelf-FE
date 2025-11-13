@@ -23,7 +23,7 @@ interface ApiErrorResponse {
   message?: string;
 }
 
-const AUTH_BASE = "/auth";
+const AUTH_BASE = "/api/auth";
 
 /**
  * 로그인: POST /api/auth/login
@@ -60,7 +60,7 @@ export const postTokenReissue = async (): Promise<TokenReissueResponseData> => {
 
   const res = await axios.post<
     ApiSuccessResponse<TokenReissueResponseData> | ApiErrorResponse
-  >("/api/auth/reissue", body, {
+  >("http://13.124.75.92:8080/api/auth/reissue", body, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,

@@ -203,11 +203,19 @@ export const TableBody = styled.tbody`
     font-size: 16px;
   }
 `
-export const StatusCell = styled.td<{ $status: '대출중' | '대출가능' | '예약중' }>`
-  color: ${(props) => (props.$status === '대출중'  ? '#8D8D8D' : '#00C471')};
-  color: ${(props) => (props.$status === '예약중'  ? '#8D8D8D' : '#00C471')};
+export const StatusCell = styled.td<{$status: '대출중' | '대출가능' | '예약중'}>`
   font-weight: bold;
-`
+  color: ${(props) => {
+    switch (props.$status) {
+      case '대출가능':
+        return '#00C471';   // 그린
+      case '대출중':
+      case '예약중':
+      default:
+        return '#8D8D8D';   // 회색
+    }
+  }};
+`;
 
 export const ActionButton = styled.button<{ $type: 'primary' | 'secondary' | 'disabled' }>`
   padding: 6px 12px;
