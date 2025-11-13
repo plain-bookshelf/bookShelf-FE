@@ -14,21 +14,19 @@ import {
 import { postTokenReissue } from "./authApi";
 
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: "/api",
+  baseURL: "http://13.124.75.92:8080",
 });
 
-/** url 정규화 (baseURL 유무 상관없이 /api 이후 경로만 비교) */
+/** url 정규화 (/api 유무 상관없이 동일 비교) */
 const extractPurePath = (url?: string): string => {
   if (!url) return "";
-  // 절대/상대 구분 없이 /api 이후만 추출
   try {
     if (url.startsWith("http://") || url.startsWith("https://")) {
       const u = new URL(url);
+      // 백엔드가 /api 프리픽스를 쓰는 경우를 대비해 동일하게 처리
       return u.pathname.startsWith("/api") ? u.pathname.slice(4) : u.pathname;
     }
-  } catch {
-    /* ignore */
-  }
+  } catch { /* ignore */ }
   return url.startsWith("/api") ? url.slice(4) : url;
 };
 
@@ -69,30 +67,26 @@ const processQueue = (error: unknown, token?: string) => {
 
 /**
  * 요청 인터셉터
- * - public URL 아니고 access token 있으면 Authorization 항상 최신값으로 세팅 (덮어쓰기)
+ * - public URL 아니고 access token 있으면 Authorization 항상 최신값으로 세팅
  */
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // ✅ 헤더 객체 보장
     if (!config.headers) config.headers = {} as AxiosRequestHeaders;
     const headers = config.headers as AxiosRequestHeaders;
 
-    // ✅ 모든 요청에 Content-Type 강제 세팅
-    // (FormData처럼 브라우저가 자동 세팅해야 하는 경우만 예외 처리)
+    // 기본 헤더
     if (!(config.data instanceof FormData)) {
       headers["Content-Type"] = "application/json";
     }
-
-    // ✅ 모든 요청에 Accept 세팅
     if (!headers.Accept) headers.Accept = "application/json";
 
-    // ✅ Authorization (비공개 API에만)
+    // 토큰 부착
     const token = getAccessToken();
     if (token && !isPublicUrl(config.url)) {
       headers.Authorization = `Bearer ${token}`;
     }
 
-    // ✅ 디버그 로그
+    // 디버그 로그
     if (import.meta.env.DEV) {
       const pure = extractPurePath(config.url);
       console.debug(
@@ -103,16 +97,14 @@ axiosInstance.interceptors.request.use(
         token ? token.slice(0, 12) + "..." + token.slice(-12) : "(none)"
       );
     }
-
     return config;
   },
   (error: AxiosError) => Promise.reject(error)
 );
+
 /**
  * 응답 인터셉터
- * - 401 발생 시 /auth/reissue 한 번 시도
- * - 성공 시 대기중인 요청들 모두 새 토큰으로 재시도
- * - 실패(REFRESH_TOKEN_INVALID, MEMBER_NOT_FOUND 등) 시 토큰 삭제 & 에러 반환
+ * - 401 → /auth/reissue 1회 시도
  */
 axiosInstance.interceptors.response.use(
   (response) => response,
@@ -120,16 +112,13 @@ axiosInstance.interceptors.response.use(
     const originalConfig = (error.config || {}) as AxiosRequestConfig & {
       _retry?: boolean;
     };
-
     const status = error.response?.status;
-    const pure = extractPurePath(originalConfig.url);
 
-    // 재발급 제외 조건들
     if (!originalConfig || originalConfig._retry || isPublicUrl(originalConfig.url) || status !== 401) {
       return Promise.reject(error);
     }
 
-    // 리프레시 토큰 없으면 바로 로그아웃
+    // 리프레시 없으면 로그아웃
     if (!getRefreshToken()) {
       removeTokens();
       return Promise.reject(error);
@@ -137,8 +126,8 @@ axiosInstance.interceptors.response.use(
 
     originalConfig._retry = true;
 
-    // 이미 다른 요청이 갱신 중이면 큐에 적재
     if (isTokenRefreshing) {
+      const pure = extractPurePath(originalConfig.url);
       console.debug("[REFRESH] queueing request:", pure || originalConfig.url);
       return new Promise((resolve, reject) => {
         failedQueue.push({ resolve, reject, config: originalConfig });
@@ -149,7 +138,6 @@ axiosInstance.interceptors.response.use(
 
     try {
       console.debug("[REFRESH] start: calling /auth/reissue");
-
       const reissueData = await postTokenReissue();
 
       // 새 토큰 저장
@@ -159,7 +147,6 @@ axiosInstance.interceptors.response.use(
         expires_in: reissueData.expires_in,
       });
 
-
       console.debug(
         "[REFRESH] success: new token",
         reissueData.access_token.slice(0, 12),
@@ -167,22 +154,20 @@ axiosInstance.interceptors.response.use(
         reissueData.access_token.slice(-12)
       );
 
-      // 큐 처리
+      // 대기중인 요청 처리
       processQueue(null, reissueData.access_token);
 
-      // 원요청 갱신 후 재시도
+      // 원요청 재시도
       if (!originalConfig.headers) originalConfig.headers = {} as AxiosRequestHeaders;
       (originalConfig.headers as AxiosRequestHeaders).Authorization = `Bearer ${reissueData.access_token}`;
 
-      console.debug("[RETRY]", pure || originalConfig.url);
-
+      console.debug("[RETRY]", extractPurePath(originalConfig.url) || originalConfig.url);
       return axiosInstance(originalConfig);
     } catch (e: unknown) {
-      const msg = e instanceof Error  ? e.message : String(e);
-
+      const msg = e instanceof Error ? e.message : String(e);
       console.debug("[REFRESH] failed:", msg);
 
-      // 명세상 만료/불일치는 모두 "다시 로그인"
+      // 명세상 에러는 모두 재로그인 유도
       if (
         msg.startsWith("REFRESH_TOKEN_INVALID") ||
         msg.startsWith("MEMBER_NOT_FOUND") ||
@@ -200,5 +185,11 @@ axiosInstance.interceptors.response.use(
     }
   }
 );
+
+if (typeof window !== "undefined") {
+  // 디버그: 콘솔에서 dbgGetToken(), dbgGetRefresh()로 확인
+  (window as any).dbgGetToken = () => getAccessToken();
+  (window as any).dbgGetRefresh = () => getRefreshToken();
+}
 
 export default axiosInstance;

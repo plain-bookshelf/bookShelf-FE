@@ -34,7 +34,7 @@ const mapCollection = (dtos: CollectionInfoDto[]): CollectionItem[] =>
     id: item.registration_number,
     library: item.affiliation,
     callNumber: item.call_number,
-    status: item.rental_status ? "대출중" : "대출가능",
+    status: item.rental_status ?  "대출가능" : "대출중",
     dueDate: undefined,
   }));
 
@@ -56,19 +56,28 @@ const mapToBookDetailData = (data: BookDetailApiData): BookDetailData => {
   };
 };
 
+/**
+ * 서버 진실 기반 상세 조회
+ * - 토큰이 없으면 즉시 NO_TOKEN 에러
+ * - 성공 구조 검증 엄격
+ * - UI는 이 반환값만으로 갱신됨 (호출부가 로컬 변형 금지)
+ */
 export const getBookDetail = async (
   bookId: number | string
 ): Promise<BookDetailData> => {
   console.log("[getBookDetail] 호출, bookId =", bookId);
-  
-  console.log("[CALL] getBookDetail token:", (getAccessToken()||"").slice(0,12), "...", (getAccessToken()||"").slice(-12));
+
+  const token = getAccessToken();
+  if (!token) {
+    // 호출부에서 로그인 페이지로 안전하게 이동하도록 고의 에러
+    throw new Error("NO_TOKEN");
+  }
+
   try {
-    const res = await axiosInstance.get<BookDetailApiResponse>(
-      `/book/${bookId}`
-    );
+    const res = await axiosInstance.get<BookDetailApiResponse>(`/book/${bookId}`);
     console.log("[getBookDetail] 응답:", res.data);
 
-    if (res.data.status !== "OK" || !res.data.data) {
+    if (!res.data || res.data.status !== "OK" || !res.data.data) {
       console.error("[getBookDetail] INVALID_RESPONSE:", res.data);
       throw new Error("INVALID_RESPONSE");
     }
@@ -90,3 +99,4 @@ export const getBookDetail = async (
     throw new Error("FETCH_FAILED");
   }
 };
+

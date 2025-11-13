@@ -17,7 +17,7 @@ export interface FindIdVerifyResponse {
 // 공용 axiosInstance(토큰/인터셉터) 안 타게 분리
 const publicAxios = axios.create({
   baseURL: "http://13.124.75.92:8080",
-  withCredentials: false,
+  withCredentials: true,
 });
 
 // 아이디 찾기 - 인증코드 이메일 발송
@@ -39,7 +39,7 @@ export async function verifyFindIdCode(
   const res = await publicAxios.post("/api/auth/find-id/verify", {
     address,
     // 서버 스펙이 ver**f**ication_code 오타이므로 그대로 맞춰서 보냄
-    verfication_code: verificationCode,
+    verification_code: verificationCode,
   });
   return res.data;
 }

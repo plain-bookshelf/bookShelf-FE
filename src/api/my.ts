@@ -1,25 +1,25 @@
-import { instance } from "./axios"
+import axiosInstance from "./apiClient";
 
 export const getMyPage = async (userId: string) => {
-  return await instance.get(`/mypage/${userId}`);
+  return await axiosInstance.get(`/mypage/${userId}`);
 }
 
 export const getMyInfo = async (userId: string) => {
-  return await instance.get(`/mypage/${userId}/info`);
+  return await axiosInstance.get(`/mypage/${userId}/info`);
 }
 
 export const putEditUserName = async (userId: string, userName: string) => {
-  return await instance.patch(`/api/mypage/${userId}/retouch`, { nick_name: userName });
+  return await axiosInstance.patch(`/api/mypage/${userId}/retouch`, { nick_name: userName });
 }
 
 export const patchEditUserImg = async (userId: string, userImg: string) => {
-  return await instance.patch(`/api/mypage/${userId}/profile-upload`, { member_profile: userImg });
+  return await axiosInstance.patch(`/api/mypage/${userId}/profile-upload`, { member_profile: userImg });
 }
 
 export const deleteUser = async () => {
-  return await instance.delete(`/api/auth/delete`);
+  return await axiosInstance.delete(`/api/auth/delete`);
 } 
 
 export const postLogout = async () => {
-  return await instance.post(`/api/auth/logout`);
+  return await axiosInstance.post(`/api/auth/logout`);
 }

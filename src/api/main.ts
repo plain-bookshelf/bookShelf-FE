@@ -1,9 +1,10 @@
-import { instance } from "./axios"
+import axiosInstance from "./apiClient";
 
 export const getMain = async () => {
-  return await instance.get(`/main`);
+  return await axiosInstance.get(`/main`);
 }
 
 export const getBookSearch = async (query: string) => {
-  return await instance.get(`/api/search?keyword=${query}`)
+  return await axiosInstance.get(`/api/search?keyword=${query}`)
 }
+
