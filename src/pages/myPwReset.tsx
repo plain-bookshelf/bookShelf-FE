@@ -1,12 +1,14 @@
-import MyPwResetInput from "../components/myPwReset/myPwResetInput"
-import { PageWrapper } from "../layouts/pageWrapper"
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import MyPwResetInput from "../components/myPwReset/myPwResetInput";
+import { PageWrapper } from "../layouts/pageWrapper";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { resetPasswordByFind } from "../api/pwReset";
 
- interface ErrorsState {
-  nowPassword: string
-  newPassword: string
-  confirmPassword: string
+interface ErrorsState {
+  username: string;
+  nowPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 export default function MyPwReset(){
@@ -14,12 +16,28 @@ export default function MyPwReset(){
   const ASCII_REGEX = /[^\x20-\x7F]/g
   const ASCII_ERROR_MESSAGE = "영문, 숫자, 일반 특수문자만 입력 가능합니다."
 
+  const [usernaem, setUsername] = useState("")
   const [nowPassword, setNowPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
-  const [errors, setErrors] = useState<ErrorsState>({nowPassword: "", newPassword: "", confirmPassword: ""})
+  const [errors, setErrors] = useState<ErrorsState>({username: "", nowPassword: "", newPassword: "", confirmPassword: ""})
   const [isLoading, setIsLoading] = useState(false)
   
+  const [errors, setErrors] = useState<ErrorsState>({
+    username: "",
+    nowPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+    // 필드별 유효성 검사
+  const handleInputChangeValidation = (
+    key: keyof ErrorsState,
+    value: string
+  ) => {
+    let newError = "";
+
+ const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate()
   
   /**
