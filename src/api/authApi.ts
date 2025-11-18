@@ -46,6 +46,7 @@ export const postLogin = async (
 
 //토큰 재발급: POST /api/auth/reissue
 export const postTokenReissue = async (): Promise<TokenReissueResponseData> => {
+  const Server_IP = import.meta.env.REACT_APP_Server_IP;
   const accessToken = getAccessToken();
   const refreshToken = getRefreshToken();
 
@@ -60,7 +61,7 @@ export const postTokenReissue = async (): Promise<TokenReissueResponseData> => {
 
   const res = await axios.post<
     ApiSuccessResponse<TokenReissueResponseData> | ApiErrorResponse
-  >("http://13.124.75.92:8080/api/auth/reissue", body, {
+  >(`${Server_IP}/api/auth/reissue`, body, {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
