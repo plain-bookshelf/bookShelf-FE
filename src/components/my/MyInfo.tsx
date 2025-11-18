@@ -219,7 +219,7 @@ export default function MyProfile() {
                 </S.EditInputBox>}
                 <S.EditInputBox>
                   <S.EditInputTitle><img src={lock} />비밀번호</S.EditInputTitle>
-                  <S.EditBox onClick={() => navigate("/idPasswordFind")}>
+                  <S.EditBox onClick={() => navigate("/myPwReset")}>
                     <S.EditInput
                       readOnly
                       allow={true}

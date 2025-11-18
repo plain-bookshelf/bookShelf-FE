@@ -4,5 +4,6 @@ export const PageWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 800px;
+  height: 1000px;
+  /* padding-top: 60px; */
 `
