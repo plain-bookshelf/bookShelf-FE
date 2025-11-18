@@ -13,8 +13,9 @@ import {
 } from "../utils/tokenService";
 import { postTokenReissue } from "./authApi";
 
+const Server_IP = import.meta.env.VITE_APP_Server_IP;
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: "http://13.124.75.92:8080",
+  baseURL: Server_IP,
 });
 
 /** url 정규화 (/api 유무 상관없이 동일 비교) */
