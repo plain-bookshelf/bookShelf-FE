@@ -51,7 +51,9 @@ const Layout = () => {
   return (
     <Wrapper>
       {renderHeader()}
-      <Outlet />
+      <MainContent>
+        <Outlet />
+      </MainContent>
       <Footer />
     </Wrapper>
   );
@@ -62,6 +64,16 @@ export default Layout;
 const Wrapper = styled.div`
   width: 100%;
   max-width: 1910px;
+  min-height: 100vh;
   margin: 0 auto;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+`;
+
+const MainContent = styled.main`
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 `;

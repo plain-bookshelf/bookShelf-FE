@@ -143,8 +143,8 @@ export default function BookDetail() {
       {activeTab === 'review' && (
         <ReviewSection
           bookId={book.bookId}
-          book={book}
-          setBook={setBook}
+          // book={book}
+          // setBook={setBook}
         />
       )}
     </S.DetailPageWrapper>

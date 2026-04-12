@@ -1,11 +1,11 @@
-import { Link } from "react-router-dom"
+//import { Link } from "react-router-dom"
 import styled from "styled-components"
 
 
 
 export const LogInContent = styled.div`
   width: 920px;
-  height: 488px;
+  height: 676px;
   border: 1px solid #E7E7E7;
   box-shadow: 1px 1px 10px  #E7E7E7;
   border-radius: 15px;
@@ -15,8 +15,8 @@ export const LogInContent = styled.div`
 `
 
 export const TextContainer = styled.div`
-  width: 300px;
-  height: 488px;
+  width: 488px;
+  height: 100%;
 
   display: flex;
   flex-direction: column;
@@ -47,107 +47,101 @@ export const LinkContent = styled.div`
   flex-direction: column;
 `
 
-export const IdPasswordFind = styled(Link)`
-  font-size: 16px;
-  color: #5D5D5D;
-  text-decoration: none;
-`
 
-export const SignUpText = styled(Link)`
-  font-size: 16px;
-  color: #00C471;
-  text-decoration: none;
-`
-
-export const InputContainer = styled.div`
-  width: 620px;
-  height: 488px;
-
+export const InputArea = styled.div`
+  flex: 1;
+  
   display: flex;
   flex-direction: column;
   justify-content: center; 
   align-items: center; 
-  gap: 10px;
+  gap: 20px;
+  `
+
+export const InputContentainer =styled.div`
+  
 `
 
 export const IdInputContainer = styled.div`
-  width: 500px;
-  height: 99px;
+  height: auto;
   display: flex;
   flex-direction: column;
-`
 
-export const IdInputTextContent = styled.div`
-  width: 87px;
-  height:25px;
+  gap: 8px;
+  `
 
-  display: flex;
-  align-items: center; 
-  gap: 5px;
+// export const IdInputTextContent = styled.div`
+//   width: 87px;
+//   height:25px;
   
-  margin-bottom: 10px;
-`
+//   display: flex;
+//   align-items: center; 
+//   gap: 5px;
+  
+//   margin-bottom: 10px;
+//   `
 
-export const IdInputImg = styled.img`
+// export const IdInputImg = styled.img`
 
-`
+// `
 
 export const IdInputText = styled.p`
-  color: #5D5D5D;
+  color: black;
+  font-weight: 500;
   font-size: 16px;
-`
+  `
 
 export const IdInputContent = styled.div<{ hasError?: boolean }>`
    width: 500px;
    height: 50px;
-   border: 1px solid #B9B9B9;
+   border: 1px solid #949494;
    border-color: ${(props) => (props.hasError ? "#C40000" : "#B9B9B9")};
    overflow: hidden;
    border-radius: 10px;
-
+   
    &:focus-within {
-      border-color:${(props) => (props.hasError ? "#C40000" : "#00C471")};
-      outline: none;
-      box-shadow: ${(props) => props.hasError ?  "0 2px 5px 5px rgba(196, 0, 0, 0.1)" : "0 2px 5px 5px rgba(0, 196, 113, 0.1)"};
-  }
-`
+     border-color:${(props) => (props.hasError ? "#C40000" : "#00C471")};
+     outline: none;
+     box-shadow: ${(props) => props.hasError ?  "0 2px 5px 5px rgba(196, 0, 0, 0.1)" : "0 2px 5px 5px rgba(0, 196, 113, 0.1)"};
+    }
+    `
 
 export const IdInput = styled.input`
   width: 500px;
   height: 50px;
-
+  
   padding-left: 15px;
   border: none;
   box-sizing: border-box;
   
-  color: #5D5D5D;
+  color: #A9A9A9;
   font-size: 16px;
   
   &:focus {
-      outline: none;
-      border: none;
-      box-shadow: none;
+    outline: none;
+    border: none;
+    box-shadow: none;
   }
-`
+  `
 
 export const PasswordInputContainer = styled.div`
   width: 500px;
   height: 99px;
-
+  
   display: flex;
   flex-direction: column;
-`
+  `
 
 export const PasswordInputTextContent = styled.div`
   width: 87px;
   height: 25px;
-
+  
   display: flex;
   align-items: center; 
   gap: 5px;
   
   margin-bottom: 10px;
-`
+  `
 
 export const PasswordInputImg = styled.img`
 
@@ -156,7 +150,7 @@ export const PasswordInputImg = styled.img`
 export const PasswordInputText = styled.p`
   color: #5D5D5D;
   font-size: 16px;
-`
+  `
 
 export const PasswordInputContent = styled.div<{ hasError?: boolean }>`
    width: 500px;
@@ -166,18 +160,18 @@ export const PasswordInputContent = styled.div<{ hasError?: boolean }>`
    overflow: hidden;
    border-radius: 10px;
    position: relative;
-
+   
    &:focus-within {
-      border-color: ${(props) => (props.hasError ? "#C40000" : "#00C471")};
-      outline: none;
-      box-shadow: ${(props) => props.hasError ?  "0 2px 5px 5px rgba(196, 0, 0, 0.1)": "0 2px 5px 5px rgba(0, 196, 113, 0.1)"};
-  }
-`
+     border-color: ${(props) => (props.hasError ? "#C40000" : "#00C471")};
+     outline: none;
+     box-shadow: ${(props) => props.hasError ?  "0 2px 5px 5px rgba(196, 0, 0, 0.1)": "0 2px 5px 5px rgba(0, 196, 113, 0.1)"};
+    }
+    `
 
 export const PasswordInput = styled.input`
   width: 500px;
   height: 50px;
-
+  
   padding-left: 15px;
   border: none;
   box-sizing: border-box;
@@ -185,46 +179,46 @@ export const PasswordInput = styled.input`
   color: #5D5D5D;
   font-size: 16px;
   
-    &:focus {
-      outline: none;
-      border: none;
-      box-shadow: none;
+  &:focus {
+    outline: none;
+    border: none;
+    box-shadow: none;
   }
-`
+  `
 
 export const SeeButton = styled.img<{ hasError?: boolean }>`
   width: 25px;
   height: 25px;
-
+  
   position: absolute;
-
+  
   cursor: pointer;
   
   top: 13px;
   right: 15px;
-
+  
   filter: ${(props) => (props.hasError ? "invert(14%) sepia(97%) saturate(7426%)" : "none")};
-
-`
+  
+  `
 
 export const Button = styled.button`
   width: 500px;
   height: 55px;
-
+  
   background-color: #00C471;
   border: none;
-
+  
   color: white;
   border-radius: 10px;
   font-size: 16px;
-
+  
   transition: all 0.2s ease;
   
-
+  
   &:active {
     background-color: #00A05D;
   }
-`
+  `
 
 export const ErrorMessageContent = styled.div`
   width: 500px;
@@ -232,10 +226,21 @@ export const ErrorMessageContent = styled.div`
   display: flex;
   align-items: center;
   gap: 4px;
-`
+  `
 
 export const ErrorMessage = styled.div`
   width: 500px;
   color: #C40000;
   font-size: 16px;
-`
+  `
+  // export const IdPasswordFind = styled(Link)`
+  //   font-size: 16px;
+  //   color: #5D5D5D;
+  //   text-decoration: none;
+  // `
+  
+  // export const SignUpText = styled(Link)`
+  //   font-size: 16px;
+  //   color: #00C471;
+  //   text-decoration: none;
+  // `

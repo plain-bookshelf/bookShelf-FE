@@ -1,9 +1,8 @@
-import FindInfo from "../components/idPasswordFind/findInfo"
+﻿import { useNavigate } from "react-router-dom";
+import { Intro } from "../components/auth/idFind/intro";
 
-export default function IdPasswordFind(){
-  return(
-    <>
-      <FindInfo></FindInfo>
-    </>
-  )
+// 아이디/비밀번호 찾기 진입 화면은 실제 찾기 플로우 시작점을 안내하는 역할만 한다.
+export default function IdPasswordFind() {
+  const navigate = useNavigate();
+  return <Intro onStart={() => navigate("/idFind")} />;
 }

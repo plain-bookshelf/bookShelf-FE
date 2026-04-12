@@ -1,8 +1,8 @@
-import styled from "styled-components";
+﻿import styled from "styled-components";
 
-// === 1. 메인 레이아웃 및 헤더/푸터 스타일 ===
+// === 1. 硫붿씤 ?덉씠?꾩썐 諛??ㅻ뜑/?명꽣 ?ㅽ???===
 
-// Header/Footer는 기존 코드 구조를 따르므로, 메인 콘텐츠 Wrapper만 정의
+// Header/Footer??湲곗〈 肄붾뱶 援ъ“瑜??곕Ⅴ誘濡? 硫붿씤 肄섑뀗痢?Wrapper留??뺤쓽
 export const DetailPageWrapper = styled.div`
   max-width: 1920px;
   display: flex;
@@ -18,12 +18,12 @@ export const Divider = styled.hr`
   margin: 20px 0;
 `;
 
-// === 2. Book Info Section 스타일 ===
+// === 2. Book Info Section ?ㅽ???===
 
 export const InfoSection = styled.section`
   width: 1440px;
   height: 405px;
-  display: flex; /* 표지, 메타데이터, 요약을 가로로 배열 */
+  display: flex; /* ?쒖?, 硫뷀??곗씠?? ?붿빟??媛濡쒕줈 諛곗뿴 */
   gap: 40px;
   padding: 30px 0;
   box-sizing: border-box;
@@ -122,7 +122,7 @@ export const BookSummaryTextContent = styled.div`
 
 `
 
-// === 3. Tab Navigation 스타일 ===
+// === 3. Tab Navigation ?ㅽ???===
 
 export const TabContainer = styled.div`
   width: 1920px;
@@ -154,7 +154,7 @@ export const TabButton = styled.button<{ $isActive: boolean }>`
 `;
 
 
-// === 4. Collection Table 스타일 ===
+// === 4. Collection Table ?ㅽ???===
 
 export const CollectionContainer = styled.section`
   overflow-x: auto;
@@ -203,18 +203,9 @@ export const TableBody = styled.tbody`
     font-size: 16px;
   }
 `
-export const StatusCell = styled.td<{$status: boolean}>`
+export const StatusCell = styled.td<{ $status: boolean }>`
   font-weight: bold;
-  color: ${(props) => {
-    switch (props.$status) {
-      case '대출가능':
-        return '#00C471';   // 그린
-      case '대출중':
-      case '예약중':
-      default:
-        return '#8D8D8D';   // 회색
-    }
-  }};
+  color: ${(props) => (props.$status ? "#8D8D8D" : "#00C471")};
 `;
 
 export const ActionButton = styled.button<{ $type: 'primary' | 'secondary' | 'disabled' }>`

@@ -3,8 +3,12 @@ import styled from "styled-components";
 import PaginationBar from "../components/pagination/PaginationBar";
 import { useList } from "../components/contexts/BorrowListContext";
 import { useState, useEffect } from "react";
-import SearchBar from "../components/searchBar/SearchBar";
+import SearchBar from "../components/SearchBar/SearchBar";
 import { getOverdueList, getRentalList, getUserSearch } from "../api/manage";
+
+interface PaginationChangeEvent {
+  selected: number;
+}
 
 export default function BorrowList() {
   const { listData, setListData } = useList();
@@ -37,7 +41,7 @@ useEffect(() => {
   };
 
   fetchData();
-}, [check, currentPage, query]);
+}, [check, currentPage, query, setListData]);
 
 
   useEffect(() => {
@@ -75,7 +79,7 @@ useEffect(() => {
       </Container>
       <PaginationBar 
         pageCount={pageCount}
-        onPageChange={(event: any) => setCurrentPage(event.selected)}
+        onPageChange={(event: PaginationChangeEvent) => setCurrentPage(event.selected)}
       />
     </>
   )
