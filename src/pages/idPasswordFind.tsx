@@ -1,12 +1,9 @@
-import { useNavigate } from "react-router-dom";
-import { Intro } from "../features/auth/idFind/intro";
+import FindInfo from "../components/idPasswordFind/findInfo"
 
-/**
- *
- */
-export default function IdPasswordFind() {
-  const navigate = useNavigate();
-
-  return <Intro onStart={() => navigate("/idFind")} />;
+export default function IdPasswordFind(){
+  return(
+    <>
+      <FindInfo></FindInfo>
+    </>
+  )
 }
-
