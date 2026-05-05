@@ -14,36 +14,33 @@ import {
 import { postTokenReissue } from "./authApi";
 
 const Server_IP = import.meta.env.VITE_APP_Server_IP;
-const normalizeBaseUrl = (url?: string) => url?.trim().replace(/^"|"$/g, "").replace(/\/+$/, "");
-
 const axiosInstance: AxiosInstance = axios.create({
-  baseURL: normalizeBaseUrl(Server_IP),
+  baseURL: Server_IP,
 });
 
-/** url 정규화 (/api 유무와 상관없이 동일 비교) */
+/** url 정규화 (/api 유무 상관없이 동일 비교) */
 const extractPurePath = (url?: string): string => {
   if (!url) return "";
   try {
     if (url.startsWith("http://") || url.startsWith("https://")) {
       const u = new URL(url);
+      // 백엔드가 /api 프리픽스를 쓰는 경우를 대비해 동일하게 처리
       return u.pathname.startsWith("/api") ? u.pathname.slice(4) : u.pathname;
     }
-  } catch {
-    /* ignore */
-  }
+  } catch { /* ignore */ }
   return url.startsWith("/api") ? url.slice(4) : url;
 };
 
-// 공개 엔드포인트는 토큰 자동 부착/재발급 대상에서 제외한다.
+// 공개 엔드포인트: 토큰 자동 부착/재발급 제외
 const isPublicUrl = (url?: string): boolean => {
   const pure = extractPurePath(url);
   return (
     pure.startsWith("/auth/login") ||
     pure.startsWith("/auth/reissue") ||
     pure.startsWith("/public") ||
-    pure.startsWith("/email/send") ||
-    pure.startsWith("/email/verify") ||
-    pure.startsWith("/auth/signup")
+    pure.startsWith("/api/email/send") ||
+    pure.startsWith("/api/email/verify") ||
+    pure.startsWith("/api/auth/signup")
   );
 };
 
@@ -74,23 +71,26 @@ const processQueue = (error: unknown, token?: string) => {
 
 /**
  * 요청 인터셉터
- * - public URL이 아니고 access token이 있으면 Authorization 헤더를 붙인다.
+ * - public URL 아니고 access token 있으면 Authorization 항상 최신값으로 세팅
  */
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     if (!config.headers) config.headers = {} as AxiosRequestHeaders;
     const headers = config.headers as AxiosRequestHeaders;
 
+    // 기본 헤더
     if (!(config.data instanceof FormData)) {
       headers["Content-Type"] = "application/json";
     }
     if (!headers.Accept) headers.Accept = "application/json";
 
+    // 토큰 부착
     const token = getAccessToken();
     if (token && !isPublicUrl(config.url)) {
       headers.Authorization = `Bearer ${token}`;
     }
 
+    // 디버그 로그
     if (import.meta.env.DEV) {
       const pure = extractPurePath(config.url);
       console.debug(
@@ -108,7 +108,7 @@ axiosInstance.interceptors.request.use(
 
 /**
  * 응답 인터셉터
- * - 401이면 /auth/reissue를 1회 시도한다.
+ * - 401 → /auth/reissue 1회 시도
  */
 axiosInstance.interceptors.response.use(
   (response) => response,
@@ -122,6 +122,7 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // 리프레시 없으면 로그아웃
     if (!getRefreshToken()) {
       removeTokens();
       return Promise.reject(error);
@@ -143,6 +144,7 @@ axiosInstance.interceptors.response.use(
       console.debug("[REFRESH] start: calling /auth/reissue");
       const reissueData = await postTokenReissue();
 
+      // 새 토큰 저장
       setTokens({
         access_token: reissueData.access_token,
         refresh_token: reissueData.refresh_token,
@@ -156,8 +158,10 @@ axiosInstance.interceptors.response.use(
         reissueData.access_token.slice(-12)
       );
 
+      // 대기중인 요청 처리
       processQueue(null, reissueData.access_token);
 
+      // 원요청 재시도
       if (!originalConfig.headers) originalConfig.headers = {} as AxiosRequestHeaders;
       (originalConfig.headers as AxiosRequestHeaders).Authorization = `Bearer ${reissueData.access_token}`;
 
@@ -167,6 +171,7 @@ axiosInstance.interceptors.response.use(
       const msg = e instanceof Error ? e.message : String(e);
       console.debug("[REFRESH] failed:", msg);
 
+      // 명세상 에러는 모두 재로그인 유도
       if (
         msg.startsWith("REFRESH_TOKEN_INVALID") ||
         msg.startsWith("MEMBER_NOT_FOUND") ||
@@ -186,9 +191,9 @@ axiosInstance.interceptors.response.use(
 );
 
 if (typeof window !== "undefined") {
-  (window as Window & { dbgGetToken?: () => string | null; dbgGetRefresh?: () => string | null }).dbgGetToken = () => getAccessToken();
-  (window as Window & { dbgGetToken?: () => string | null; dbgGetRefresh?: () => string | null }).dbgGetRefresh = () => getRefreshToken();
+  // 디버그: 콘솔에서 dbgGetToken(), dbgGetRefresh()로 확인
+  (window as any).dbgGetToken = () => getAccessToken();
+  (window as any).dbgGetRefresh = () => getRefreshToken();
 }
 
 export default axiosInstance;
-

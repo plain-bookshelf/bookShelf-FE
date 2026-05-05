@@ -1,9 +1,14 @@
-import { useNavigate } from "react-router-dom";
-import { Success } from "../features/auth/pwFind/success";
+import { ShowPwInfo } from "../components/showPw/showPwInfo"
+import { PageWrapper } from "../layouts/pageWrapper"
+
 
 export default function ShowPw() {
-  const navigate = useNavigate();
 
-  return <Success onConfirm={() => navigate("/login")} />;
+  return(
+    <>
+      <PageWrapper>
+        <ShowPwInfo></ShowPwInfo>
+      </PageWrapper>
+    </>
+  )
 }
-
