@@ -1,93 +1,101 @@
-﻿import { getAccessToken, getRefreshToken } from "../utils/tokenService";
-import { publicClient, requestWithFallback } from "./publicClient";
-import type { ApiResponse, LoginRequest, LoginTokenData, TokenReissueResponseData } from "../types/authTypes";
+import axios from "axios";
+import axiosInstance from "./apiClient";
+import {
+  getAccessToken,
+  getRefreshToken,
+} from "../utils/tokenService";
+import type {
+  LoginRequest,
+  LoginTokenData,
+  TokenReissueRequest,
+  TokenReissueResponseData,
+} from "../types/authTypes";
+
+interface ApiSuccessResponse<T> {
+  status: string; // "CREATED"
+  message: string;
+  data: T;
+}
 
 interface ApiErrorResponse {
-  code?: string;
+  status?: string;
+  code?: string; // "A004", "M001" 등 서버에서 내려주는 경우
   message?: string;
 }
 
-const AUTH_BASE_CANDIDATES = ["/api/auth", "/api"];
+const AUTH_BASE = "/api/auth";
 
-const readError = (status: number, data?: ApiErrorResponse) => {
-  if (status === 400 && data?.code === "AUTH-003") return "비밀번호가 일치하지 않습니다.";
-  if (status === 404 && data?.code === "MEMBER-003") return "일치하는 사용자 정보를 찾을 수 없어요.";
-  if (status === 404 && data?.code === "AFFILIATION-001") return "소속 정보를 찾을 수 없어요.";
-  return data?.message ?? "인증 요청 처리 중 오류가 발생했어요.";
-};
-
-export const postLogin = async (loginData: LoginRequest): Promise<LoginTokenData> => {
-  const platformType = loginData.platformType ?? "WEB";
-  const body = {
-    username: loginData.username,
-    password: loginData.password,
-  };
-
-  const res = await requestWithFallback<ApiResponse<LoginTokenData>>(
-    AUTH_BASE_CANDIDATES.map((base) => ({
-      method: "POST",
-      url: `${base}/login`,
-      params: { platformType },
-      data: body,
-      headers: { "Content-Type": "application/json" },
-    })),
+/**
+ * 로그인: POST /api/auth/login
+ */
+export const postLogin = async (
+  loginData: LoginRequest
+): Promise<LoginTokenData> => {
+  const res = await axiosInstance.post<ApiSuccessResponse<LoginTokenData>>(
+    `${AUTH_BASE}/login`,
+    loginData
   );
 
-  if ((res.status === 200 || res.status === 201) && res.data?.data?.access_token) {
-    return res.data.data;
+  // 명세상 201 CREATED 이지만, 혹시 200 쓸 수도 있으니 둘 다 허용
+  if (res.status !== 200 && res.status !== 201) {
+    throw new Error("LOGIN_FAILED");
   }
 
-  throw new Error(readError(res.status, res.data as ApiErrorResponse));
+  return res.data.data;
 };
 
+//토큰 재발급: POST /api/auth/reissue
 export const postTokenReissue = async (): Promise<TokenReissueResponseData> => {
+  const Server_IP = import.meta.env.VITE_APP_Server_IP;
   const accessToken = getAccessToken();
   const refreshToken = getRefreshToken();
 
-  if (!refreshToken) {
+  if (!accessToken || !refreshToken) {
     throw new Error("NO_TOKENS");
   }
 
-  const res = await requestWithFallback<ApiResponse<TokenReissueResponseData>>(
-    AUTH_BASE_CANDIDATES.map((base) => ({
-      method: "PUT",
-      url: `${base}/reissue`,
-      params: { platformType: "WEB" },
-      headers: {
-        // 새 명세는 refresh token을 body가 아니라 헤더로 받는다.
-        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-        "X-Refresh-Token": refreshToken,
-      },
-    })),
-  );
+  const body: TokenReissueRequest = {
+    access_token: accessToken,
+    refresh_token: refreshToken,
+  };
 
-  if ((res.status === 200 || res.status === 201) && res.data?.data?.access_token) {
-    return res.data.data;
-  }
-
-  const errorBody = res.data as ApiErrorResponse;
-  if (res.status === 404) {
-    throw new Error(errorBody.code === "AUTH-005" ? "REFRESH_TOKEN_INVALID" : "MEMBER_NOT_FOUND");
-  }
-
-  throw new Error(readError(res.status, errorBody));
-};
-
-export const postLogout = async (): Promise<void> => {
-  const accessToken = getAccessToken();
-
-  const res = await publicClient.post<ApiResponse<string> | ApiErrorResponse>(
-    "/api/auth/logout",
-    undefined,
-    {
-      validateStatus: () => true,
-      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+  const res = await axios.post<
+    ApiSuccessResponse<TokenReissueResponseData> | ApiErrorResponse
+  >(`${Server_IP}/api/auth/reissue`, body, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
     },
-  );
+    // 여기서 직접 status 보고 판단할 거라서 모두 허용
+    validateStatus: () => true,
+  });
 
-  if (res.status === 204 || res.status === 200) {
-    return;
+  // 성공: 201 CREATED
+  if (res.status === 201 || res.status === 200) {
+    const data = (res.data as ApiSuccessResponse<TokenReissueResponseData>).data;
+    if (!data?.access_token || !data?.refresh_token) {
+      throw new Error("REISSUE_INVALID_RESPONSE");
+    }
+    return data;
   }
 
-  throw new Error((res.data as ApiErrorResponse | undefined)?.message ?? "로그아웃에 실패했어요.");
+  // 에러 응답 파싱
+  const err = res.data as ApiErrorResponse;
+
+  if (res.status === 401) {
+    // *REFRESH_TOKEN_NOT_MATCH*
+    // code: "A004"
+    throw new Error("REFRESH_TOKEN_INVALID");
+  }
+
+  if (res.status === 404) {
+    // MEMBER_NOT_FOUND
+    // code: "M001"
+    throw new Error("MEMBER_NOT_FOUND");
+  }
+
+  // 그 외는 전부 재발급 실패로 처리
+  throw new Error(
+    `REISSUE_FAILED:${err.code || res.status}:${err.message || ""}`.trim()
+  );
 };

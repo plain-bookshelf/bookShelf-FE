@@ -1,98 +1,93 @@
-﻿import { sendEmailCode } from "./emailRegistrationApi";
-import { requestWithFallback } from "./publicClient";
+import axios from "axios";
 import axiosInstance from "./apiClient";
 
-interface BaseResponse<T = string | boolean> {
+interface BaseResponse<T = string> {
   status: string;
   message: string;
   data: T;
 }
 
-export const sendFindPasswordEmail = async (email: string): Promise<void> => {
-  await sendEmailCode(email, "FIND_PASSWORD");
+/**
+ * 비밀번호 찾기 - 이메일로 인증코드 전송
+ * @throws Error("EMAIL_NOT_FOUND") - 가입되지 않은 이메일
+ * @throws Error("SEND_FAILED") - 기타 전송 실패
+ */
+export const sendFindPasswordEmail = async (address: string): Promise<void> => {
+  try {
+    const res = await axiosInstance.post<BaseResponse>(
+      "/api/auth/find-password/send",
+      { address },
+      { headers: { "Content-Type": "application/json" } }
+    );
+
+    if (res.status !== 200 || res.data.status !== "OK") {
+      throw new Error("SEND_FAILED");
+    }
+  } catch (error: unknown) {                             
+    if (axios.isAxiosError(error) && error.response) {
+      if (error.response.status === 404) {
+        throw new Error("EMAIL_NOT_FOUND");
+      }
+    }
+    throw new Error("SEND_FAILED");
+  }
 };
 
+/**
+ * 비밀번호 찾기 - 이메일 인증코드 검증
+ * @returns boolean - true면 인증 성공
+ * @throws Error("VERIFY_FAILED") - 인증 실패 (코드 불일치 등)
+ */
 export const verifyFindPasswordCode = async (
-  email: string,
-  verificationCode: string,
+  address: string,
+  verificationCode: string
 ): Promise<boolean> => {
-  const res = await requestWithFallback<BaseResponse<boolean>>([
-    {
-      method: "POST",
-      url: "/api/find-password",
-      data: { email, verification_code: verificationCode },
-      headers: { "Content-Type": "application/json" },
-    },
-    {
-      method: "POST",
-      url: "/api/auth/find-password/verify",
-      data: { address: email, verification_code: verificationCode },
-      headers: { "Content-Type": "application/json" },
-    },
-  ]);
+  try {
+    const res = await axiosInstance.post<BaseResponse<boolean>>(
+      "/api/auth/find-password/verify",
+      { address, verification_code: verificationCode },
+      { headers: { "Content-Type": "application/json" } }
+    );
 
-  if ((res.status === 200 || res.status === 201) && res.data?.data === true) {
-    return true;
+    if (res.status !== 200 || res.data.status !== "OK") {
+      throw new Error("VERIFY_FAILED");
+    }
+    return res.data.data === true;
+  } catch (error: unknown) {                               
+    if (axios.isAxiosError(error) && error.response) {
+      if (error.response.status === 404) {
+        throw new Error("VERIFY_FAILED");
+      }
+    }
+    throw new Error("VERIFY_FAILED");
   }
-
-  throw new Error((res.data as { message?: string } | undefined)?.message ?? "인증에 실패했어요.");
 };
 
-export const resetPasswordByFind = async (email: string, newPassword: string): Promise<void> => {
-  const res = await requestWithFallback<BaseResponse>([
-    {
-      method: "PATCH",
-      url: "/api/password-resest",
-      data: { email, new_password: newPassword },
-      headers: { "Content-Type": "application/json" },
-    },
-    {
-      method: "PATCH",
-      url: "/api/password-reset",
-      data: { email, new_password: newPassword },
-      headers: { "Content-Type": "application/json" },
-    },
-  ]);
-
-  if (res.status === 200 || res.status === 201) {
-    return;
-  }
-
-  if (res.status === 404) {
-    throw new Error("MEMBER_NOT_FOUND");
-  }
-
-  throw new Error((res.data as { message?: string } | undefined)?.message ?? "비밀번호 재설정에 실패했어요.");
-};
-
-export const changePassword = async (
-  existingPassword: string,
-  newPassword: string,
+/**
+ * 비밀번호 찾기 - 최종 비밀번호 재설정
+ * @throws Error("MEMBER_NOT_FOUND") - 회원 정보 없음
+ * @throws Error("RETOUCH_FAILED") - 기타 실패
+ */
+export const resetPasswordByFind = async (
+  username: string,
+  newPassword: string
 ): Promise<void> => {
-  // 로그인 상태 비밀번호 변경은 access token으로 사용자를 식별한다.
-  const res = await axiosInstance.patch<BaseResponse>(
-    "/api/password-change",
-    {
-      existing_password: existingPassword,
-      new_password: newPassword,
-    },
-    {
-      headers: { "Content-Type": "application/json" },
-      validateStatus: () => true,
-    },
-  );
+  try {
+    const res = await axiosInstance.patch<BaseResponse>(
+      "/api/auth/find-password/retouch",
+      { username: username, password: newPassword },
+      { headers: { "Content-Type": "application/json" } }
+    );
 
-  if (res.status === 200) {
-    return;
+    if (res.status !== 201 || res.data.status !== "CREATED") {
+      throw new Error("RETOUCH_FAILED");
+    }
+  } catch (error: unknown) {                            
+    if (axios.isAxiosError(error) && error.response) {
+      if (error.response.status === 404) {
+        throw new Error("MEMBER_NOT_FOUND");
+      }
+    }
+    throw new Error("RETOUCH_FAILED");
   }
-
-  if (res.status === 400) {
-    throw new Error("NOT_MATCH_EXISTING_PASSWORD");
-  }
-
-  if (res.status === 404) {
-    throw new Error("MEMBER_NOT_FOUND");
-  }
-
-  throw new Error((res.data as { message?: string } | undefined)?.message ?? "비밀번호 변경에 실패했어요.");
 };

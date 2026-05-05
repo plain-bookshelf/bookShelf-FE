@@ -1,181 +1,201 @@
-﻿import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { sendEmailVerification, verifyEmailCode } from "../api/emailRegistrationApi";
-import signup from "../api/signup";
-import { SignUp } from "../components/auth/signup/signUp";
-import type { signupRequest } from "../types/signupTypes";
+import { PageWrapper } from "../layouts/pageWrapper"
+import SingupInput from "../components/signup/SignupInput"
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import Signup from "../api/signup"
+import type { signupRequest } from "../types/signupTypes"
+import { useLocation } from "react-router-dom"
 
-const ASCII_REGEX = /[^\x20-\x7F]/;
-const EMAIL_REGEX = /^[a-z0-9+_.-]+@[a-z0-9.-]+\.[a-z0-9-.]+$/i;
+// 허용되는 문자
+const ASCII_REGEX = /[^\x20-\x7F]/
+const ASCII_ERROR_MESSAGE = "영문, 숫자, 일반 특수문자만 입력 가능합니다."
+const FIXED_AFFILIATION = "대덕소프트웨어마이스터고"
 
-// 회원가입은 하나의 페이지 안에서 4단계 흐름을 순차적으로 제어한다.
-export default function SignUpPage() {
-  const navigate = useNavigate();
-  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
-  const [email, setEmail] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [affiliationName, setAffiliationName] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [timerSeconds, setTimerSeconds] = useState(300);
+export default function Singup() {
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [affiliation] = useState(FIXED_AFFILIATION)
+  const [errors, setErrors] = useState({
+    username: "",
+    password: "",
+    confirmPassword: "",
+  })
+  const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    // 인증번호 단계에서만 5분 타이머를 내려 보낸다.
-    if (step !== 2 || timerSeconds <= 0) return undefined;
-    const timer = window.setInterval(() => {
-      setTimerSeconds((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => window.clearInterval(timer);
-  }, [step, timerSeconds]);
+  const navigate = useNavigate()
 
-  const formatTimer = (seconds: number) =>
-    `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, "0")}`;
-
-  const requestVerification = async () => {
-    // 1단계에서는 유효한 이메일인지 확인한 뒤 인증 메일만 요청한다.
-    if (!EMAIL_REGEX.test(email.trim())) {
-      setError("올바른 이메일 형식을 입력해 주세요.");
-      return;
-    }
-    setIsLoading(true);
-    setError("");
-    try {
-      await sendEmailVerification(email.trim());
-      setTimerSeconds(300);
-      setStep(2);
-    } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "인증 메일 전송에 실패했어요.");
-    } finally {
-      setIsLoading(false);
-    }
+  const location = useLocation();
+  const {emailAddress} =
+  (location.state as { emailAddress?: string}) || {
+    emailAddress: "",
+    isEmailVerified: false,
   };
+  
+  /**
+   * 입력값의 유효성을 검사하고, 오류 메시지만 설정합니다.
+   * @param key - 오류를 설정할 필드
+   * @param value - 현재 입력된 문자열
+   */
+  const handleInputChangeValidation = (key: keyof typeof errors, value: string) => {
+    let newError = ""
+    
+    // 1. ASCII 범위 외 문자가 있는지 확인
+    if (ASCII_REGEX.test(value)) {
+      newError = ASCII_ERROR_MESSAGE
+    }
 
-  const verifyCode = async () => {
-    // 2단계에서는 인증번호 입력 여부와 만료 여부를 함께 검사한다.
-    if (!verificationCode.trim()) {
-      setError("인증번호를 입력해 주세요.");
-      return;
+    // 2. 필드별 유효성 검사 (길이, 빈 값, 일치 여부 등)
+    if (key === "username") {
+        if (!value.trim()) {
+          newError = newError || "아이디를 입력하세요"
+        } else if (value.length < 3 || value.length > 16) {
+          newError = newError || "3~16자 이내로 입력하세요"
+        }
+    } else if (key === "password") {
+        if (!value.trim()) {
+          newError = newError || "비밀번호를 입력하세요"
+        } else if (value.length < 8) {
+          newError = newError || "8자 이상 자리를 입력하세요"
+        }
+    } else if (key === "confirmPassword") {
+        if (!value.trim()) {
+          newError = newError || "비밀번호 확인을 입력하세요"
+        } else if (password !== value) {
+          // 비밀번호 불일치는 전체 유효성 검사 시점에 다시 확인되지만,
+          // 입력 중 사용자 피드백을 위해 미리 체크
+          newError = newError || "비밀번호가 일치하지 않습니다"
+        }
     }
-    if (timerSeconds <= 0) {
-      setError("인증 시간이 만료되었어요. 인증번호를 다시 요청해 주세요.");
-      return;
-    }
-    setIsLoading(true);
-    setError("");
-    try {
-      await verifyEmailCode(email.trim(), verificationCode.trim());
-      setStep(3);
-    } catch (verifyError) {
-      setError(verifyError instanceof Error ? verifyError.message : "인증번호 확인에 실패했어요.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  const validateUserInfo = () => {
-    // 3단계는 화면에서 즉시 걸러낼 수 있는 기본 검증 규칙만 검사한다.
-    if (!username.trim()) return "아이디를 입력해 주세요.";
-    if (username.length < 3 || username.length > 16) return "아이디는 3자 이상 16자 이하로 입력해 주세요.";
-    if (ASCII_REGEX.test(username)) return "아이디는 영문, 숫자, 일반 특수문자만 사용할 수 있어요.";
-    if (!password.trim()) return "비밀번호를 입력해 주세요.";
-    if (password.length < 8) return "비밀번호는 8자 이상이어야 해요.";
-    if (ASCII_REGEX.test(password)) return "비밀번호는 영문, 숫자, 일반 특수문자만 사용할 수 있어요.";
-    if (!confirmPassword.trim()) return "비밀번호 확인을 입력해 주세요.";
-    if (password !== confirmPassword) return "비밀번호가 서로 일치하지 않아요.";
-    return "";
-  };
+    // 3. 오류 상태 업데이트
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [key]: newError,
+    }))
+  }
 
-  const submitSignup = async () => {
-    // 마지막 단계에서만 실제 회원가입 API를 호출한다.
-    if (!affiliationName.trim()) {
-      setError("소속 도서관을 입력해 주세요.");
-      return;
+  const handleUsernameChange = (value: string) => {
+    setUsername(value) // 필터링 없이 값 그대로 저장
+    handleInputChangeValidation("username", value)
+  }
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value) // 필터링 없이 값 그대로 저장
+    handleInputChangeValidation("password", value)
+    
+    // 비밀번호 변경 시, 비밀번호 확인 필드의 오류도 함께 업데이트
+    if (confirmPassword.trim()) {
+      handleInputChangeValidation("confirmPassword", confirmPassword)
     }
-    setIsLoading(true);
-    setError("");
+  }
+
+  const handleConfirmPasswordChange = (value: string) => {
+    setConfirmPassword(value) // 필터링 없이 값 그대로 저장
+    handleInputChangeValidation("confirmPassword", value)
+  }
+
+  const handleSignup = async () => {
+    // 최종 제출 시점에서 모든 유효성 검사 다시 실행 (중복 검사)
+    setErrors({
+      username: "",
+      password: "",
+      confirmPassword: "",
+    })
+
+    const newErrors = {
+      username: "",
+      password: "",
+      confirmPassword: "",
+    }
+    
+    // 1. ASCII 오류 확인 (회원가입 버튼 클릭 시)
+    if (ASCII_REGEX.test(username)) {
+       newErrors.username = ASCII_ERROR_MESSAGE
+    }
+    if (ASCII_REGEX.test(password)) {
+       newErrors.password = ASCII_ERROR_MESSAGE
+    }
+    if (ASCII_REGEX.test(confirmPassword)) {
+       newErrors.confirmPassword = ASCII_ERROR_MESSAGE
+    }
+
+    // 2. 기존 유효성 검사 (ASCII 오류가 없거나, 다른 오류가 있는 경우)
+    if (!username.trim()) {
+      newErrors.username = newErrors.username || "아이디를 입력하세요"
+    } else if (username.length < 3 || username.length > 16) {
+      newErrors.username = newErrors.username || "3~16 이내로 자리를 입력하세요"
+    }
+
+    if (!password.trim()) {
+      newErrors.password = newErrors.password || "비밀번호를 입력하세요"
+    } else if (password.length < 8) {
+      newErrors.password = newErrors.password || "8자리 이상 자리를 입력하세요"
+    }
+
+    if (!confirmPassword.trim()) {
+      newErrors.confirmPassword = newErrors.confirmPassword || "비밀번호 확인을 입력하세요"
+    } else if (password !== confirmPassword) {
+      newErrors.confirmPassword = newErrors.confirmPassword || "비밀번호가 일치하지 않습니다"
+    }
+
+    if (newErrors.username || newErrors.password || newErrors.confirmPassword) {
+      setErrors(newErrors)
+      return
+    }
+
+    setIsLoading(true)
+
     const requestData: signupRequest = {
-      username: username.trim(),
-      // 현재 화면에는 닉네임 입력이 없어 아이디를 기본 닉네임으로 함께 넘긴다.
-      nickname: username.trim(),
-      password,
-      address: email.trim(),
-      affiliation_name: affiliationName.trim(),
-    };
+      username: username,
+      nickname: username,
+      password: password,
+      address: emailAddress || "", 
+      affiliation_name: "대덕소프트웨어마이스터고등학교",
+    }
+
     try {
-      await signup(requestData);
-      alert("회원가입이 완료되었어요.");
-      navigate("/login");
-    } catch (signupError) {
-      setError(signupError instanceof Error ? signupError.message : "회원가입에 실패했어요.");
+      // (서버 통신 시뮬레이션)
+      const userData = await Signup(requestData)
+      
+      console.log("회원가입 데이터:", {userData})
+      alert("회원가입이 완료되었습니다!")
+
+      setTimeout(() => {
+        navigate("/Login")
+      }, 100)
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "회원가입 중 오류가 발생하였습니다"
+      console.error("🚨 회원가입 실패:", errorMessage);
+      
+      alert(`회원가입 실패: ${errorMessage}`);
+      
+      setErrors({
+        username: "",
+        password: "",
+        confirmPassword: "",
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
-
-  const handleSubmit = async () => {
-    setError("");
-    // 단계별로 같은 확인 버튼을 재사용한다.
-    if (step === 1) return requestVerification();
-    if (step === 2) return verifyCode();
-    if (step === 3) {
-      const validationError = validateUserInfo();
-      if (validationError) {
-        setError(validationError);
-        return;
-      }
-      setStep(4);
-      return;
-    }
-    await submitSignup();
-  };
-
-  const handleReSend = async () => {
-    // 재발급 중복 호출을 막기 위해 로딩 중에는 재요청을 무시한다.
-    if (isLoading) return;
-    await requestVerification();
-  };
+  }
 
   return (
-    <SignUp
-      step={step}
-      email={email}
-      verificationCode={verificationCode}
-      username={username}
-      password={password}
-      confirmPassword={confirmPassword}
-      affiliationName={affiliationName}
-      error={error}
-      timerText={formatTimer(timerSeconds)}
-      isLoading={isLoading}
-      onEmailChange={(value) => {
-        setEmail(value);
-        setError("");
-      }}
-      onVerificationCodeChange={(value) => {
-        setVerificationCode(value);
-        setError("");
-      }}
-      onUsernameChange={(value) => {
-        setUsername(value);
-        setError("");
-      }}
-      onPasswordChange={(value) => {
-        setPassword(value);
-        setError("");
-      }}
-      onConfirmPasswordChange={(value) => {
-        setConfirmPassword(value);
-        setError("");
-      }}
-      onAffiliationNameChange={(value) => {
-        setAffiliationName(value);
-        setError("");
-      }}
-      onSubmit={handleSubmit}
-      onReSend={handleReSend}
-    />
-  );
+    <>
+      <PageWrapper>
+        <SingupInput
+          username={username}
+          password={password}
+          confirmPassword={confirmPassword}
+          affiliation={affiliation}
+          errors={errors}
+          onUsernameChange={handleUsernameChange}
+          onPasswordChange={handlePasswordChange}
+          onConfirmPasswordChange={handleConfirmPasswordChange}
+          onSubmit={handleSignup}
+          isLoading={isLoading}
+        />
+      </PageWrapper>
+    </>
+  )
 }

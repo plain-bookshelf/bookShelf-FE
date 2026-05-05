@@ -1,3 +1,5 @@
+
+import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar/SearchBar"
 import * as B from "../components/Book/Book"
 import type { Book, SearchBook } from "../types/Book"
@@ -9,7 +11,6 @@ import { getBookSearch, getMain } from "../api/main"
 import { useUser } from "../components/contexts/UserContext"
 import Loading from "../components/loading/loading"
 import { setUserId } from "../utils/tokenService"
-import { useNavigate } from "react-router-dom"
 
 export default function Main() {
   const { user, setUser } = useUser();
@@ -29,13 +30,9 @@ export default function Main() {
         const res = await getMain();
         setPopularBookList(res.data.data.book_popularity_list_response_dto);
         setNewBookList(res.data.data.book_recent_list_response_dto);
-        setUser({
-          ...user,
-          img: res.data.data.profile,
-          id: res.data.data.member_id,
-        });
-
-        setUserId(res.data.data.member_id);
+        setUser({...user, img: res.data.data.profile, id: res.data.data.member_id});
+        
+        setUserId(user.id);
         setLoading(false);
       } catch(error) {
         console.error(error);
@@ -43,7 +40,7 @@ export default function Main() {
     }
 
     fetchData();
-  }, [setUser, user])
+  }, [user.id])
 
 
   const handleSearch = (content: string) => {
