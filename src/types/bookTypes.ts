@@ -7,8 +7,7 @@ export type CollectionStatus =
 export interface CollectionItem {
   id: string; // 등록번호
   library: string; // 도서관
-  status: '대출중' | '대출가능' | '예약중';
-  //status: boolean;
+  status: boolean;
   dueDate?: string; // 반납 예정일 (대출중일 경우)
   callNumber: string; // 청구기호
 }
@@ -25,10 +24,11 @@ export interface BookDetailData {
   registrationId: string;
   releaseDate: string;
   collection: CollectionItem[];
+  review_response_dtos: Comment[];
 }
 
 export interface Comment {
-  id: number;
+  id: number | string;
   // comment: number | string;
   user: string;
   text: string;

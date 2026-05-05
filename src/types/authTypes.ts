@@ -1,24 +1,28 @@
+﻿export type PlatformType = "WEB" | "ANDROID" | "IOS";
+
 export interface LoginRequest {
-  credential: string;
+  username: string;
   password: string;
+  platformType?: PlatformType;
 }
 
 export interface LoginTokenData {
-  grant_type: "Bearer";
+  username?: string;
+  authority?: string;
+  platform_type?: PlatformType;
+  affiliation_name?: string;
+  profile_image?: string;
+  oauth_provider?: string;
   access_token: string;
-  expires_in: number;
   refresh_token: string;
+  expires_in?: number;
 }
 
 export interface ApiResponse<T> {
-  status: string;  // "CREATED", "OK" 등
+  status: string;
   message: string;
   data: T;
 }
 
-export interface TokenReissueRequest {
-  refresh_token: string;
-  access_token: string;
-}
-
+// 재발급 응답은 현재 로그인 응답과 같은 토큰 구조를 그대로 재사용한다.
 export type TokenReissueResponseData = LoginTokenData;
