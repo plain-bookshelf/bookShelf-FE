@@ -1,40 +1,54 @@
-import { useEffect, useState } from "react";
-import { useManage } from "../shared/contexts/ManagementContext";
-import PaginationBar from "../shared/pagination/PaginationBar";
-import { CategoryBox, InfoBox } from "../shared/borrowMange/borrowManage";
-import { getAllowList } from "../api/manage";
+import { CategoryBox, InfoBox } from "../components/borrowMange/borrowManage";
 import styled from "styled-components";
+import PaginationBar from "../components/pagination/PaginationBar";
+import { useManage } from "../components/contexts/ManagementContext";
+import { useState, useEffect } from "react";
+import { getAllowList } from "../api/manage";
 
 export default function AllowList() {
   const { manageData, setManageData } = useManage();
   const [currentPage, setCurrentPage] = useState(0);
   const [pageCount, setPageCount] = useState(0);
 
+  //여기서 페이지 단위로 데이터 + 페이지 개수 요청 보내면 될듯
   useEffect(() => {
+    console.log("test")
     const fetchData = async () => {
       try {
-        const response = await getAllowList(currentPage);
-        setPageCount(response.data.data.total_pages);
-        setManageData(response.data.data.response_dto_list);
+        console.log("관리자 승인 페이지 불러오는 중");
+        const res = await getAllowList(currentPage);
+        setPageCount(res.data.data.total_pages);
+        setManageData(res.data.data.response_dto_list);
       } catch (error) {
         console.log(error);
       }
-    };
+    }
 
-    fetchData();
-  }, [currentPage, setManageData]);
+    fetchData(); 
+  }, [currentPage]);
 
-  return (
+  return(
     <>
       <Container>
         <CategoryBox />
-        {manageData.map((item) => (
-          <InfoBox key={item.registration_number} {...item} />
-        ))}
+        <BookContinaer>
+          {manageData.map((e) => (
+            <InfoBox
+              book_name={e.book_name}
+              registration_number={e.registration_number}
+              nick_name={e.nick_name}
+              request_date={e.request_date}
+              allow={e.allow}
+            />
+          ))}
+        </BookContinaer>
       </Container>
-      <PaginationBar pageCount={pageCount} onPageChange={(event) => setCurrentPage(event.selected)} />
+      <PaginationBar 
+        pageCount={pageCount}
+        onPageChange={(event: any) => setCurrentPage(event.selected)}
+      />
     </>
-  );
+  )
 }
 
 const Container = styled.div`
@@ -43,5 +57,10 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
+`
 
+const BookContinaer = styled.div`
+  display: flex;
+  flex-direction: column;
+  min-height: 249px;
+`
