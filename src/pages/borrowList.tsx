@@ -6,6 +6,10 @@ import { useState, useEffect } from "react";
 import SearchBar from "../components/SearchBar/SearchBar";
 import { getOverdueList, getRentalList, getUserSearch } from "../api/manage";
 
+interface PaginationChangeEvent {
+  selected: number;
+}
+
 export default function BorrowList() {
   const { listData, setListData } = useList();
   const [currentPage, setCurrentPage] = useState(0);
@@ -37,7 +41,7 @@ useEffect(() => {
   };
 
   fetchData();
-}, [check, currentPage, query]);
+}, [check, currentPage, query, setListData]);
 
 
   useEffect(() => {
@@ -61,23 +65,21 @@ useEffect(() => {
         <SearchBar handleSearch={handleSearch} State="user" />
         <CheckBox checked={check} onChange={toggleCheck} />
         <CategoryBox />
-        <BookContinaer>
-          {listData.map((e) => (
-            <InfoBox
-              book_name={e.book_name}
-              registration_number={e.registration_number}
-              nick_name={e.nick_name}
-              return_date={e.return_date}
-              overdue_status={e.overdue_status}
-              allow={e.allow}
-              day={e.day}
-            />
-          ))}
-        </BookContinaer>
+        {listData.map((e) => (
+          <InfoBox
+            book_name={e.book_name}
+            registration_number={e.registration_number}
+            nick_name={e.nick_name}
+            return_date={e.return_date}
+            overdue_status={e.overdue_status}
+            allow={e.allow}
+            day={e.day}
+          />
+        ))}
       </Container>
       <PaginationBar 
         pageCount={pageCount}
-        onPageChange={(event: any) => setCurrentPage(event.selected)}
+        onPageChange={(event: PaginationChangeEvent) => setCurrentPage(event.selected)}
       />
     </>
   )
@@ -88,10 +90,4 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-`
-
-const BookContinaer = styled.div`
-  display: flex;
-  flex-direction: column;
-  min-height: 249px;
 `

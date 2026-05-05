@@ -1,59 +1,59 @@
-import axios from "axios";
-import axiosInstance from "./apiClient";
-import type {
-  EmailSendRequest,
-  EmailVerifyRequest,
-  ApiResponse,
-  EmailVerifyResponse,
-} from "../types/emailTypes";
+﻿import type { ApiResponse, EmailSendRequest, EmailVerifyRequest, EmailVerifyResponse, VerificationCodeType } from "../types/emailTypes";
+import { requestWithFallback } from "./publicClient";
 
-const EMAIL_BASE = "/email";
+// 이메일 인증 API는 회원가입과 비밀번호 찾기에서 공통으로 재사용된다.
+const EMAIL_SEND_CANDIDATES = ["/api/email/send"];
+const EMAIL_VERIFY_CANDIDATES = ["/api/email/verify"];
 
-/** 이메일 인증코드 전송: POST /api/email/send */
-export async function sendEmailVerification(address: string): Promise<ApiResponse> {
-  const body: EmailSendRequest = { address };
+const readErrorMessage = (fallback: string, payload?: { message?: string }) => payload?.message ?? fallback;
 
-  try {
-    const res = await axiosInstance.post<ApiResponse>(`/api${EMAIL_BASE}/send`, body);
+export async function sendEmailCode(
+  email: string,
+  codeType: VerificationCodeType,
+): Promise<ApiResponse> {
+  // 명세 기준으로 body에는 email, query에는 codeType이 들어간다.
+  const body: EmailSendRequest = { email };
 
-    if (res.status === 201 || res.data.status === "CREATED") {
-      return res.data;
-    }
-    const msg = (res.data as { message?: string } | undefined)?.message ?? "이메일 전송에 실패했습니다.";
-    throw new Error(msg);
-  } catch (error: unknown) {                               // ✅ any → unknown
-    if (axios.isAxiosError(error) && error.response) {
-      const data = error.response.data as { message?: string } | undefined;  // ✅ 최소 형태로 단언
-      throw new Error(data?.message ?? "이메일 전송에 실패했습니다.");
-    }
-    throw new Error("네트워크 오류가 발생했습니다.");
+  const res = await requestWithFallback<ApiResponse>(
+    EMAIL_SEND_CANDIDATES.map((url) => ({
+      method: "POST",
+      url,
+      params: { codeType },
+      data: body,
+      headers: { "Content-Type": "application/json" },
+    })),
+  );
+
+  if ((res.status === 200 || res.status === 201) && res.data?.status) {
+    return res.data;
   }
+
+  throw new Error(readErrorMessage("이메일 전송에 실패했어요.", res.data as { message?: string }));
 }
 
-/** 이메일 인증코드 검증: PUT /api/email/verify */
+export async function sendEmailVerification(email: string): Promise<ApiResponse> {
+  return sendEmailCode(email, "VERIFICATION_EMAIL");
+}
+
 export async function verifyEmailCode(
-  address: string,
-  verificationCode: string
+  email: string,
+  verificationCode: string,
 ): Promise<EmailVerifyResponse> {
-  const body: EmailVerifyRequest = {
-    address,
-    verification_code: verificationCode,
-  };
+  // 서버는 verification_code라는 snake_case 필드명을 요구한다.
+  const body: EmailVerifyRequest = { email, verification_code: verificationCode };
 
-  try {
-    const res = await axiosInstance.put<EmailVerifyResponse>(`/api${EMAIL_BASE}/verify`, body);
+  const res = await requestWithFallback<EmailVerifyResponse>(
+    EMAIL_VERIFY_CANDIDATES.map((url) => ({
+      method: "POST",
+      url,
+      data: body,
+      headers: { "Content-Type": "application/json" },
+    })),
+  );
 
-    if (res.status === 201 || res.data.status === "CREATED") {
-      return res.data;
-    }
-
-    const msg = (res.data as { message?: string } | undefined)?.message ?? "인증번호 확인에 실패했습니다.";
-    throw new Error(msg);
-  } catch (error: unknown) {                               // ✅ any → unknown
-    if (axios.isAxiosError(error) && error.response) {
-      const data = error.response.data as { message?: string } | undefined;
-      throw new Error(data?.message ?? "인증번호 확인에 실패했습니다.");
-    }
-    throw new Error("네트워크 오류가 발생했습니다.");
+  if ((res.status === 200 || res.status === 201) && res.data?.status) {
+    return res.data;
   }
+
+  throw new Error(readErrorMessage("인증번호 확인에 실패했어요.", res.data as { message?: string }));
 }

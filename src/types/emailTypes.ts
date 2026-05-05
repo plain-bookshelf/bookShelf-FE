@@ -1,23 +1,19 @@
+﻿export type VerificationCodeType = "VERIFICATION_EMAIL" | "FIND_PASSWORD";
+
 export interface ApiResponse {
-     status: "success" | "fail" | "error" | "CREATED";
-    message: string;
-    data: Record<string, unknown>; 
+  status: string;
+  message: string;
+  data: Record<string, unknown> | string | boolean;
 }
 
-// 요청 (Request) 타입 
 export interface EmailSendRequest {
-    address: string; // 필수지만, 빈 문자열 ("")도 가능하도록 하여 API 로직에서 처리
+  email: string;
 }
-
-
-// 이메일 인증번호 확인 요청 (PUT /email/verify)
 
 export interface EmailVerifyRequest {
-    address: string;
-    verification_code: string;
+  email: string;
+  verification_code: string;
 }
 
-
 export type EmailSendResponse = ApiResponse;
-
 export type EmailVerifyResponse = ApiResponse;
