@@ -1,189 +1,162 @@
-import PwResetInput from "../components/pwReset/pwResetInput";
-import { PageWrapper } from "../layouts/pageWrapper";
 import { useState } from "react";
-import { useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { resetPasswordByFind } from "../api/pwReset";
+import { Reset } from "../features/auth/pwFind/reset";
 
-interface ErrorsState {
-  username: string;
-  newPassword: string;
-  confirmPassword: string;
-}
+const ASCII_REGEX = /[^\x20-\x7F]/;
 
+/**
+ * 비밀번호 재설정 페이지 컨테이너
+ *
+ * 이 페이지는 "비밀번호 찾기" 흐름에서 이메일 인증까지 마친 뒤 도착하는 화면이다.
+ *
+ * 중요한 전제
+ * - 이 페이지는 단독 진입을 기대하지 않는다.
+ * - 이전 페이지(checkEmailPwReset)에서 email을 route state로 넘겨 줘야 정상 동작한다.
+ *
+ * 즉, 이 화면은 보안상 "이미 이메일 인증이 끝난 사용자"만 사용하는 단계라고 이해하면 된다.
+ */
 export default function PwReset() {
-  const ASCII_REGEX = /[^\x20-\x7F]/g;
-  const ASCII_ERROR_MESSAGE = "영문, 숫자, 일반 특수문자만 입력 가능합니다.";
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  /**
+   * username
+   *
+   * 디자인상 입력칸은 존재하지만,
+   * 현재 비밀번호 찾기 기반 재설정 API에서는 실제 요청에 사용하지 않는다.
+   *
+   * 그래도 입력 UI와 스펙을 맞추기 위해 state로 보관한다.
+   */
+  const [username, setUsername] = useState("");
+
+  /**
+   * currentPassword
+   *
+   * 역시 디자인상 표시되는 입력칸용 값이다.
+   * 현재 "비밀번호 찾기 후 재설정" API는 이메일 인증을 이미 신뢰하기 때문에
+   * 실제 요청에는 사용하지 않는다.
+   */
+  const [currentPassword, setCurrentPassword] = useState("");
+
+  /**
+   * newPassword / confirmPassword
+   *
+   * newPassword는 실제 서버에 보낼 새 비밀번호,
+   * confirmPassword는 사용자가 같은 값을 한 번 더 입력했는지 확인하기 위한 비교용 값이다.
+   */
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [username, setUsername] = useState("");
-  const [errors, setErrors] = useState<ErrorsState>({
-    username: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
+
+  /**
+   * error
+   *
+   * 현재 사용자가 해결해야 할 오류 메시지를 저장한다.
+   * 예: route state 없음, 비밀번호 길이 부족, 비밀번호 확인 불일치 등
+   */
+  const [error, setError] = useState("");
+
+  /**
+   * isLoading
+   *
+   * 새 비밀번호 저장 요청이 진행 중인지 표시한다.
+   */
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate();
-  // const location = useLocation();
+  /**
+   * email
+   *
+   * 이전 단계에서 인증을 마친 이메일 주소다.
+   * 이 값이 없다는 것은 사용자가 중간 단계를 건너뛰고 직접 진입했을 가능성이 높다.
+   */
+  const email = location.state?.email ?? "";
 
-
-  // 입력 변경 시 필드별 유효성 검사
-  const handleInputChangeValidation = (
-    key: keyof ErrorsState,
-    value: string) => {
-    let newError = "";
-
-    // 1. ASCII 범위 외 문자 체크
-    if (ASCII_REGEX.test(value)) {
-      newError = ASCII_ERROR_MESSAGE;
-    }
-
-    // 2. 필드별 유효성 검사
-    if(key === "username"){
-      if(!value.trim()){
-        newError = newError || "아이디를 입력하세요";
-      }
-    }else if (key === "newPassword") {
-      if (!value.trim()) {
-        newError = newError || "비밀번호를 입력하세요";
-      } else if (value.length < 8) {
-        newError = newError || "8자 이상 자리를 입력하세요";
-      }
-    } else if (key === "confirmPassword") {
-      if (!value.trim()) {
-        newError = newError || "비밀번호 확인을 입력하세요";
-      } else if (newPassword !== value) {
-        newError = newError || "비밀번호가 일치하지 않습니다";
-      }
-    }
-
-    setErrors((prev) => ({
-      ...prev,
-      [key]: newError,
-    }));
-  };
-
-  const handleUsernameChange = (value: string) => {
-    setUsername(value);
-    handleInputChangeValidation("username", value);
-  };
-  
-  const handlePasswordChange = (value: string) => {
-    setNewPassword(value);
-    handleInputChangeValidation("newPassword", value);
-
-    if (confirmPassword.trim()) {
-      handleInputChangeValidation("confirmPassword", confirmPassword);
-    }
-  };
-
-  const handleConfirmPasswordChange = (value: string) => {
-    setConfirmPassword(value);
-    handleInputChangeValidation("confirmPassword", value);
-  };
-
-  const handlePwReset = async () => {
-
-    // 에러 초기화
-    setErrors({ username: "", newPassword: "", confirmPassword: "" });
-
-    const newErrors: ErrorsState = {
-      username: "",
-      newPassword: "",
-      confirmPassword: "",
-    };
-
-    // 1. ASCII 체크
-    if (ASCII_REGEX.test(username)) {
-      newErrors.username = ASCII_ERROR_MESSAGE;
-    }
-    if (ASCII_REGEX.test(newPassword)) {
-      newErrors.newPassword = ASCII_ERROR_MESSAGE;
-    }
-    if (ASCII_REGEX.test(confirmPassword)) {
-      newErrors.confirmPassword = ASCII_ERROR_MESSAGE;
-    }
-
-    // 2. 기본 유효성 검사
-    if (!username.trim()){
-      newErrors.username = newErrors.username || "아이디를 입력하세요";
+  /**
+   * 최종 제출 함수
+   *
+   * 처리 순서
+   * 1. 이전 단계에서 전달된 email 존재 여부 확인
+   * 2. 비밀번호 형식 검사
+   * 3. 재설정 API 호출
+   * 4. 성공 시 완료 화면으로 이동
+   */
+  const handleSubmit = async () => {
+    if (!email) {
+      setError("이메일 인증 정보가 없어요. 처음부터 다시 진행해 주세요.");
+      return;
     }
 
     if (!newPassword.trim()) {
-      newErrors.newPassword =
-        newErrors.newPassword || "비밀번호를 입력하세요";
-    } else if (newPassword.length < 8) {
-      newErrors.newPassword =
-        newErrors.newPassword || "8자 이상 자리를 입력하세요";
+      setError("새 비밀번호를 입력해주세요.");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setError("비밀번호는 8자 이상이어야 해요.");
+      return;
+    }
+
+    if (ASCII_REGEX.test(newPassword)) {
+      setError("비밀번호는 영문, 숫자, 일반 특수문자만 사용할 수 있어요.");
+      return;
     }
 
     if (!confirmPassword.trim()) {
-      newErrors.confirmPassword =
-        newErrors.confirmPassword || "비밀번호 확인을 입력하세요";
-    } else if (newPassword !== confirmPassword) {
-      newErrors.confirmPassword =
-        newErrors.confirmPassword || "비밀번호가 일치하지 않습니다";
+      setError("새 비밀번호 확인을 입력해주세요.");
+      return;
     }
 
-    // 에러 있으면 종료
-    if (newErrors.username || newErrors.newPassword || newErrors.confirmPassword) {
-      setErrors(newErrors);
+    if (newPassword !== confirmPassword) {
+      setError("새 비밀번호가 서로 일치하지 않아요.");
       return;
     }
 
     setIsLoading(true);
+    setError("");
 
     try {
-      //  실제 서버 호출
-      await resetPasswordByFind(username, newPassword);
+      /**
+       * 화면에는 입력칸이 여러 개 있지만,
+       * 현재 API가 실제로 요구하는 핵심 값은 email + newPassword다.
+       */
+      await resetPasswordByFind(email, newPassword);
 
-      alert("비밀번호 재설정이 완료되었습니다!");
-
-      // 완료 페이지로 이동 (기존 로직 유지)
-      navigate("/showPw", {
-        state: { resetPassword: newPassword },
-      });
-    } catch (err) {
-      console.error("비밀번호 재설정 중 오류 발생", err);
-
-      let message = "비밀번호 재설정 중 오류가 발생했습니다.";
-
-      if (err instanceof Error) {
-        if (err.message === "MEMBER_NOT_FOUND") {
-          message =
-            "회원 정보를 찾을 수 없습니다. 처음부터 다시 진행해주세요.";
-        } else if (err.message === "RETOUCH_FAILED") {
-          message =
-            "비밀번호 재설정에 실패했습니다. 잠시 후 다시 시도해주세요.";
-        } else {
-          message = err.message;
-        }
+      /**
+       * 완료 화면에서 어떤 이메일의 작업이 끝났는지 참고할 수 있게
+       * email을 함께 넘긴다.
+       */
+      navigate("/showPw", { state: { email } });
+    } catch (submitError) {
+      if (submitError instanceof Error && submitError.message === "MEMBER_NOT_FOUND") {
+        setError("회원 정보를 찾을 수 없어요. 다시 확인해 주세요.");
+      } else {
+        setError(submitError instanceof Error ? submitError.message : "비밀번호 재설정에 실패했어요.");
       }
-
-      setErrors((prev) => ({
-        ...prev,
-        newPassword: message,
-      }));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <PageWrapper>
-      <PwResetInput
-        username={username}
-        newPassword={newPassword}
-        confirmPassword={confirmPassword}
-        isLoading={isLoading}
-        usernameError={errors.username}
-        newPasswordError={errors.newPassword}
-        confirmPasswordError={errors.confirmPassword}
-        handleUsernameChange={handleUsernameChange}
-        handlePasswordChange={handlePasswordChange}
-        handleConfirmPasswordChange={handleConfirmPasswordChange}
-        onSubmit={handlePwReset}
-      />
-    </PageWrapper>
+    <Reset
+      username={username}
+      currentPassword={currentPassword}
+      newPassword={newPassword}
+      confirmPassword={confirmPassword}
+      error={error}
+      isLoading={isLoading}
+      onUsernameChange={setUsername}
+      onCurrentPasswordChange={setCurrentPassword}
+      onNewPasswordChange={(value) => {
+        setNewPassword(value);
+        setError("");
+      }}
+      onConfirmPasswordChange={(value) => {
+        setConfirmPassword(value);
+        setError("");
+      }}
+      onSubmit={handleSubmit}
+    />
   );
 }
+

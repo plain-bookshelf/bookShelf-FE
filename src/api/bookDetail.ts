@@ -1,8 +1,8 @@
-import type { BookDetailData, CollectionItem } from "../types/bookTypes";
-import axiosInstance from "./apiClient";
-import { getAccessToken } from "../utils/tokenService";
-import undefindImg from "../assets/undefindImg.png";
+import type { BookDetailData, CollectionItem, Comment } from "../types/bookTypes";
 import axios from "axios";
+import undefindImg from "../assets/undefindImg.png";
+import { getAccessToken } from "../utils/tokenService";
+import axiosInstance from "./apiClient";
 
 interface CollectionInfoDto {
   affiliation: string;
@@ -30,6 +30,8 @@ interface BookDetailApiResponse {
   data: BookDetailApiData;
 }
 
+type ReviewDto = Record<string, unknown>;
+
 const mapCollection = (dtos: CollectionInfoDto[]): CollectionItem[] =>
   dtos.map((item) => ({
     id: item.registration_number,
@@ -39,8 +41,41 @@ const mapCollection = (dtos: CollectionInfoDto[]): CollectionItem[] =>
     dueDate: undefined,
   }));
 
+const toRecord = (value: unknown): ReviewDto =>
+  typeof value === "object" && value !== null ? (value as ReviewDto) : {};
+
+const pick = (dto: ReviewDto, keys: string[]) => {
+  for (const key of keys) {
+    const value = dto[key];
+    if (value !== undefined && value !== null) {
+      return value;
+    }
+  }
+  return undefined;
+};
+
+const mapReviewDtosToComments = (dtos: unknown[] = []): Comment[] => {
+  return dtos.map((review, index) => {
+    const dto = toRecord(review);
+    const id = pick(dto, ["id", "commentId", "comment_id", "reviewId", "review_id", "reviewID"]);
+
+    return {
+      id: typeof id === "number" || typeof id === "string" ? id : `temp-${Date.now()}-${index}`,
+      userId: String(pick(dto, ["userId", "member_id", "memberId"]) ?? ""),
+      user: String(pick(dto, ["user", "member_nick_name", "nickName", "name"]) ?? "사용자"),
+      text: String(pick(dto, ["text", "content", "review_content"]) ?? ""),
+      date: String(pick(dto, ["date", "created_at", "createdAt"]) ?? new Date().toISOString()),
+      likes: Number(pick(dto, ["likes", "like_count", "likeCount"]) ?? 0),
+      profileImg: (pick(dto, ["profileImg", "member_profile", "profile_url"]) as string | undefined) ?? undefined,
+    };
+  });
+};
+
 const mapToBookDetailData = (data: BookDetailApiData): BookDetailData => {
   const collection = mapCollection(data.collection_information_response_dtos);
+  const reviews = Array.isArray(data.review_response_dtos)
+    ? mapReviewDtosToComments(data.review_response_dtos)
+    : [];
 
   return {
     bookId: data.book_id,
@@ -54,48 +89,32 @@ const mapToBookDetailData = (data: BookDetailApiData): BookDetailData => {
     summary: data.book_introduction ?? "등록된 소개가 없습니다.",
     categories: data.book_type ? [data.book_type] : [],
     collection,
+    review_response_dtos: reviews,
   };
 };
 
-/**
- * 서버 진실 기반 상세 조회
- * - 토큰이 없으면 즉시 NO_TOKEN 에러
- * - 성공 구조 검증 엄격
- * - UI는 이 반환값만으로 갱신됨 (호출부가 로컬 변형 금지)
- */
-export const getBookDetail = async (
-  bookId: number | string
-): Promise<BookDetailData> => {
-  console.log("[getBookDetail] 호출, bookId =", bookId);
+export const getBookDetail = async (bookId: number | string): Promise<BookDetailData> => {
+  console.log("[getBookDetail] called", bookId);
 
   const token = getAccessToken();
   if (!token) {
-    // 호출부에서 로그인 페이지로 안전하게 이동하도록 고의 에러
     throw new Error("NO_TOKEN");
   }
 
   try {
     const res = await axiosInstance.get<BookDetailApiResponse>(`/book/${bookId}`);
-    console.log("[getBookDetail] 응답:", res.data);
 
     if (!res.data || res.data.status !== "OK" || !res.data.data) {
-      console.error("[getBookDetail] INVALID_RESPONSE:", res.data);
       throw new Error("INVALID_RESPONSE");
     }
-    
-    console.log(res.data.data)
+
     return mapToBookDetailData(res.data.data);
-  } catch (err: unknown) {
-    if (axios.isAxiosError(err)) {
-      const status = err.response?.status;
-      console.error("[getBookDetail] 응답 에러:", status, err.response?.data);
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error)) {
+      const status = error.response?.status;
 
       if (status === 401) throw new Error("UNAUTHORIZED");
       if (status === 404) throw new Error("NOT_FOUND");
-    } else if (err instanceof Error) {
-      console.error("[getBookDetail] 요청 보냈지만 응답 없음:", err.message);
-    } else {
-      console.error("[getBookDetail] 구성 에러:", err);
     }
 
     throw new Error("FETCH_FAILED");

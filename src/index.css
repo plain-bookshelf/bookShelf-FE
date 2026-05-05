@@ -1,11 +1,30 @@
-body {
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  overflow-x: hidden;
+﻿*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-h1{
+:root {
+  --desktop-max-width: 1920px;
+  --content-max-width: 1440px;
+  --page-gutter: clamp(24px, 3vw, 48px);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 1280px;
+  overflow-x: auto;
+  background: #ffffff;
+}
+
+h1, h2{
   margin: 0;
 }
 
@@ -18,7 +37,7 @@ ul{
   padding-left: 25px;
 }
 
-form :focus{
+/* form :focus{
    outline: none;
    box-shadow: 2px 5px 5px rgba(0, 196, 113, 0.1);
-}
+} */
