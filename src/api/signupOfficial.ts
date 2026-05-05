@@ -1,4 +1,4 @@
-﻿import type { apiResponse, signupResponse } from "../types/signupTypes";
+import type { apiResponse, signupResponse } from "../types/signupTypes";
 import { requestWithFallback } from "./publicClient";
 
 interface SignupOfficialRequest {
@@ -28,3 +28,4 @@ export async function signupOfficial(data: SignupOfficialRequest): Promise<signu
 }
 
 export default signupOfficial;
+

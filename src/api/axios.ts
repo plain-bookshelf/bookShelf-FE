@@ -1,4 +1,4 @@
-﻿import axios from "axios";
+import axios from "axios";
 import { storage, ACCESS_TOKEN_KEY } from "../utils/tokenService";
 
 // 백엔드 일반 관리 API 요청에 사용하는 기본 axios 인스턴스다.
@@ -28,3 +28,4 @@ instance.interceptors.request.use(
 
   (error) => Promise.reject(error)
 );
+

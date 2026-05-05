@@ -1,4 +1,4 @@
-﻿import axios, {
+import axios, {
   type AxiosInstance,
   type AxiosRequestConfig,
   type AxiosError,
@@ -191,3 +191,4 @@ if (typeof window !== "undefined") {
 }
 
 export default axiosInstance;
+

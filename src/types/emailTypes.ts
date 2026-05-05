@@ -1,4 +1,4 @@
-﻿export type VerificationCodeType = "VERIFICATION_EMAIL" | "FIND_PASSWORD";
+export type VerificationCodeType = "VERIFICATION_EMAIL" | "FIND_PASSWORD";
 
 export interface ApiResponse {
   status: string;

@@ -1,4 +1,4 @@
-﻿export type PlatformType = "WEB" | "ANDROID" | "IOS";
+export type PlatformType = "WEB" | "ANDROID" | "IOS";
 
 export interface LoginRequest {
   username: string;

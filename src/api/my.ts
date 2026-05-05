@@ -1,4 +1,4 @@
-﻿import axiosInstance from "./apiClient";
+import axiosInstance from "./apiClient";
 import { removeTokens } from "../utils/tokenService";
 
 export const getMyPage = async (userId: string) => {
@@ -31,3 +31,4 @@ export const postLogout = async () => {
 
   throw new Error((res.data as { message?: string } | undefined)?.message ?? "로그아웃에 실패했어요.");
 };
+

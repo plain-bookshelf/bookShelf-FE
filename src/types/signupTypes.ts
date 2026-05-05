@@ -1,4 +1,4 @@
-﻿// 회원가입 타입은 새 명세 필드와 기존 화면 입력 구조를 동시에 수용하도록 작성돼 있다.
+// 회원가입 타입은 새 명세 필드와 기존 화면 입력 구조를 동시에 수용하도록 작성돼 있다.
 export interface signupRequest {
   username: string;
   nickname?: string;
