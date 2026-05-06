@@ -94,12 +94,15 @@ function mapRequestItem(item: RentalRequestStreamItem): RequestAdminItem {
 }
 
 function mapStatusItem(item: RentalStatusApiItem): StatusAdminItem {
+  const bookAffiliationId = item.book_affiliation_id ?? item.bookAffiliationId;
+  const registrationNumber = item.registration_number ?? item.registrationNumber ?? "-";
+
   return {
-    id: String(item.book_affiliation_id ?? item.book_detail_id),
+    id: String(bookAffiliationId ?? item.book_detail_id),
     bookDetailId: item.book_detail_id,
-    bookAffiliationId: item.book_affiliation_id,
+    bookAffiliationId,
     title: item.title,
-    registrationNumber: item.registration_number ?? "-",
+    registrationNumber,
     callNumber: item.call_number,
     publisher: item.publisher,
     userName: item.nickname,
@@ -286,14 +289,23 @@ export default function Admin() {
     const target = statusItems.find((item) => item.id === itemId);
     if (!target) return;
 
+    if (!target.bookAffiliationId) {
+      setStatusError("반납 식별 정보가 없어 반납을 진행할 수 없어요.");
+      return;
+    }
+
     setSubmittingId(itemId);
 
     try {
-      await patchBookReturn(target.bookAffiliationId ?? target.bookDetailId);
+      await patchBookReturn(target.bookAffiliationId);
       setConfirmState(null);
       setStatusItems((prev) => prev.filter((item) => item.id !== itemId));
     } catch (error) {
-      setStatusError(error instanceof Error ? error.message : "반납 처리에 실패했습니다.");
+      if (error instanceof Error && error.message === "BOOK_AFFILIATION_ID_MISSING") {
+        setStatusError("반납 식별 정보가 없어 반납을 진행할 수 없어요.");
+      } else {
+        setStatusError(error instanceof Error ? error.message : "반납 처리에 실패했습니다.");
+      }
     } finally {
       setSubmittingId(null);
     }

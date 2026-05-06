@@ -26,6 +26,7 @@ export interface RentalStatusApiItem {
   member_id: number;
   book_detail_id: number;
   book_affiliation_id?: number;
+  bookAffiliationId?: number;
   title: string;
   publisher: string;
   nickname: string;
@@ -33,6 +34,7 @@ export interface RentalStatusApiItem {
   return_date: string;
   is_overdue: boolean;
   registration_number?: string;
+  registrationNumber?: string;
 }
 
 interface RequestSnapshotPayload {
@@ -181,6 +183,10 @@ export const patchRentalAllow = async (bookDetailId: string | number) => {
  * book_affiliation_id가 없으면 호출부에서 book_detail_id를 대체값으로 넘기게 된다.
  */
 export const patchBookReturn = async (bookAffiliationId: string | number) => {
+  if (bookAffiliationId === "" || bookAffiliationId === null || bookAffiliationId === undefined) {
+    throw new Error("BOOK_AFFILIATION_ID_MISSING");
+  }
+
   return await instance.patch(`/return/${bookAffiliationId}`);
 };
 
