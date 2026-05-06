@@ -13,7 +13,6 @@ export default function FormSection({
   onIdentifierChange,
   onPasswordChange,
   onSubmit,
-  onFindId,
   onFindPassword,
   onSignup,
 }: LoginProps) {
@@ -60,16 +59,12 @@ export default function FormSection({
           {error && <S.Error>{error}</S.Error>}
           
           <S.LinkRow>
-            <S.LinkButton type="button" onClick={onFindId}>
-              아이디 찾기
+            <S.LinkButton type="button" onClick={onSignup}>
+              회원가입
             </S.LinkButton>
             <S.Divider />
             <S.LinkButton type="button" onClick={onFindPassword}>
               비밀번호 찾기
-            </S.LinkButton>
-            <S.Divider />
-            <S.LinkButton type="button" onClick={onSignup}>
-              회원가입
             </S.LinkButton>
           </S.LinkRow>
           <S.Bottom>

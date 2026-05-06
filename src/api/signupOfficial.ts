@@ -1,5 +1,5 @@
 import type { apiResponse, signupResponse } from "../types/signupTypes";
-import { requestWithFallback } from "./publicClient";
+import { publicClient } from "./publicClient";
 
 interface SignupOfficialRequest {
   username: string;
@@ -9,23 +9,20 @@ interface SignupOfficialRequest {
   verification_code: string;
 }
 
-export async function signupOfficial(data: SignupOfficialRequest): Promise<signupResponse> {
-  const res = await requestWithFallback<apiResponse<signupResponse>>([
-    {
-      method: "POST",
-      url: "/api/signup-official",
-      params: { platformType: "WEB" },
-      data,
-      headers: { "Content-Type": "application/json" },
-    },
-  ]);
+const url = "/api/member"
 
-  if (res.status === 201 && res.data?.data) {
-    return res.data.data;
+export async function signupOfficial(data: SignupOfficialRequest): Promise<signupResponse> {
+  const response = await publicClient.post<apiResponse<signupResponse>>(`${url}/signup-official`, data, {
+    params: { platformType: "WEB" },
+    headers: { "Content-Type": "application/json" },
+    validateStatus: () => true,
+  });
+
+  if (response.status === 201 && response.data?.data) {
+    return response.data.data;
   }
 
-  throw new Error((res.data as { message?: string } | undefined)?.message ?? "관계자 회원가입에 실패했어요.");
+  throw new Error((response.data as { message?: string } | undefined)?.message ?? "관리자 회원가입에 실패했습니다.");
 }
 
 export default signupOfficial;
-

@@ -1,21 +1,9 @@
 import * as S from "./introStyle";
 
-/**
- * 비밀번호 찾기 소개 카드 props
- *
- * 이 화면은 설명 후 다음 단계로 진입시키는 역할만 하므로
- * 필요한 이벤트는 onStart 하나면 충분하다.
- */
 interface IntroProps {
   onStart: () => void;
 }
 
-/**
- * 비밀번호 찾기 소개 카드
- *
- * 실제 이메일 입력 전,
- * 사용자가 어떤 방식으로 비밀번호를 재설정하게 되는지 설명하는 화면이다.
- */
 export function Intro({ onStart }: IntroProps) {
   return (
     <S.Shell>

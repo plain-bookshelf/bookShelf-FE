@@ -1,5 +1,5 @@
 import type { apiResponse, signupResponse } from "../types/signupTypes";
-import { requestWithFallback } from "./publicClient";
+import { publicClient } from "./publicClient";
 
 interface SignupSocialRequest {
   affiliation_name: string;
@@ -7,22 +7,17 @@ interface SignupSocialRequest {
 }
 
 export async function signupSocial(data: SignupSocialRequest): Promise<signupResponse> {
-  const res = await requestWithFallback<apiResponse<signupResponse>>([
-    {
-      method: "POST",
-      url: "/api/signup-social",
-      params: { platformType: "WEB" },
-      data,
-      headers: { "Content-Type": "application/json" },
-    },
-  ]);
+  const response = await publicClient.post<apiResponse<signupResponse>>("/signup-social", data, {
+    params: { platformType: "WEB" },
+    headers: { "Content-Type": "application/json" },
+    validateStatus: () => true,
+  });
 
-  if (res.status === 201 && res.data?.data) {
-    return res.data.data;
+  if (response.status === 201 && response.data?.data) {
+    return response.data.data;
   }
 
-  throw new Error((res.data as { message?: string } | undefined)?.message ?? "소셜 회원가입에 실패했어요.");
+  throw new Error((response.data as { message?: string } | undefined)?.message ?? "소셜 회원가입에 실패했습니다.");
 }
 
 export default signupSocial;
-

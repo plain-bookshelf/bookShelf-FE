@@ -1,4 +1,3 @@
-// 아이디 찾기 결과 화면 전용 스타일 모음이다.
 import styled from "styled-components";
 
 export const Shell = styled.div`
@@ -11,13 +10,13 @@ export const Shell = styled.div`
 `;
 
 export const Card = styled.div`
-  width: min(100%, clamp(500px, 32vw, 560px));
-  min-height: clamp(390px, 25vw, 430px);
+  width: min(100%, clamp(560px, 36vw, 640px));
+  min-height: clamp(400px, 27vw, 470px);
   background: #ffffff;
   border: 1px solid #efefef;
   border-radius: 12px;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-  padding: 34px 32px 32px;
+  padding: 40px 36px 36px;
   box-sizing: border-box;
 `;
 
@@ -36,7 +35,7 @@ export const Dot = styled.div<{ $active?: boolean; $wide?: boolean }>`
 
 export const Title = styled.h1`
   margin: 0 0 18px;
-  font-size: clamp(26px, 1.8vw, 30px);
+  font-size: 40px;
   line-height: 1.25;
   font-weight: 800;
   color: #4a4a4a;
@@ -45,7 +44,7 @@ export const Title = styled.h1`
 
 export const Description = styled.p`
   margin: 0;
-  font-size: clamp(13px, 0.95vw, 15px);
+  font-size: 16px;
   line-height: 1.45;
   color: #8b8b8b;
   word-break: keep-all;
@@ -61,21 +60,20 @@ export const ResultBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(17px, 1.15vw, 20px);
+  font-size: 20px;
   line-height: 1.4;
   color: #4a4a4a;
 `;
 
 export const ConfirmButton = styled.button`
   width: 100%;
-  height: clamp(44px, 2.9vw, 48px);
+  height: 52px;
   margin-top: 18px;
   border: none;
   border-radius: 8px;
   background: #9be995;
   color: #ffffff;
-  font-size: clamp(14px, 1vw, 16px);
+  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
 `;
-

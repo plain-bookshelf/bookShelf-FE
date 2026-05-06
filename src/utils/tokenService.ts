@@ -2,6 +2,7 @@ export const ACCESS_TOKEN_KEY = "access_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
 const EXPIRES_AT_KEY = "access_token_expires_at"; // number (ms)
 const USER_ID_KEY = "user_id";
+const DEVICE_TOKEN_KEY = "device_token";
 
 // const storage = window.sessionStorage; //바꾸면 sessionStorage 사용
  export const storage = window.localStorage; 
@@ -56,6 +57,22 @@ export function setUserId(id: string){
 
 export function getUserId(): string{
   return storage.getItem(USER_ID_KEY) ??  "";
+}
+
+export function getOrCreateDeviceToken(): string {
+  const existing = storage.getItem(DEVICE_TOKEN_KEY);
+
+  if (existing) {
+    return existing;
+  }
+
+  const created =
+    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `web-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+  storage.setItem(DEVICE_TOKEN_KEY, created);
+  return created;
 }
 
 export function isAccessTokenExpired(): boolean {

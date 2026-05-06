@@ -190,5 +190,4 @@ if (typeof window !== "undefined") {
   (window as Window & { dbgGetToken?: () => string | null; dbgGetRefresh?: () => string | null }).dbgGetRefresh = () => getRefreshToken();
 }
 
-export default axiosInstance;
-
+export default axiosInstance

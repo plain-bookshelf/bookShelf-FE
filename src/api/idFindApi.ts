@@ -93,7 +93,7 @@ export async function verifyFindIdCode(
   address: string,
   verificationCode: string,
 ): Promise<FindIdVerifyResponse> {
-  const response = await publicAxios.post("/api/auth/find-id/verify", {
+  const response = await publicAxios.post("/api/auth/find-id", {
     address,
     verification_code: verificationCode,
   });
